@@ -16,7 +16,7 @@ use Module::ExtractUse;
 {
     my $p=Module::ExtractUse->new;
     my $used=$p->extract_use('ExtractUse.pm')->string;
-    is($used,'strict warnings Pod::Simple Parse::RecDescent Module::ExtractUseGrammar vars');
+    is($used,'5.006 strict warnings Pod::Simple Parse::RecDescent Module::ExtractUseGrammar vars');
 }
 
 

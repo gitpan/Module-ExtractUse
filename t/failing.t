@@ -8,7 +8,7 @@ my $p=Module::ExtractUse->new;
 
 my @tests=
   (
-   ['use base (ClassDBI,FooBar);','Class::DBI Foo::Bar'],
+   ['use base (Class::DBI,FooBar);','Class::DBI Foo::Bar'],
    ['use constant lib_ext => $Config{lib_ext};','constant'],
   );
 

@@ -9,8 +9,10 @@ use Parse::RecDescent;
 use Module::ExtractUseGrammar;
 
 use vars qw($VERSION);
+$VERSION = '0.10';
 
-$VERSION = '0.05';
+#$::RD_TRACE=1;
+#$::RD_HINT=1;
 
 sub new {
     my $class=shift;
@@ -36,13 +38,35 @@ sub extract_use {
 	$pod_parser->parse_file($module);
     }
 
-    # generate parser
-    my $parser=Module::ExtractUseGrammar->new();
+    # to keep parsing time short, split code in statements
+    # (I know that this is not very exact, patches welcome!)
+    my @statements=split(/;/,$podless);
+    my @found;
+    foreach my $statement (@statements) {
+	$statement=~s/\n+/ /gs;
+	my $result;
 
-    # parse!
-    my @found=@{$parser->start($podless)};
+	# now that we've got some code containing 'use' or 'require',
+	# parse it! (using different entry point to save some more
+	# time)
+	if ($statement=~/\buse/) {
+	    $statement=~s/^(.*?)use/use/;
+	    my $parser=Module::ExtractUseGrammar->new();
+	    $result=$parser->use($statement.";");
+
+	} elsif ($statement=~/\brequire/) {
+	    $statement=~s/^(.*?)require/require/;
+	    my $parser=Module::ExtractUseGrammar->new();
+	    $result=$parser->require($statement.";");
+
+	} else {
+	    next;
+	}
+
+	push(@found,split(/ /,$result)) if $result;
+    }
+
     $self->{'found'}=\@found;
-
     return $self;
 }
 
@@ -91,7 +115,7 @@ __END__
 
 =head1 NAME
 
-Module::ExtractUse - Find out what are modules are used
+Module::ExtractUse - Find out what modules are used
 
 =head1 SYNOPSIS
 
@@ -142,10 +166,15 @@ contains the source code.
 
 The code will be stripped from POD (using a quickly hacked POD-Remover
 based on Pod::Simple, that should go away as soon as this hack is
-included in Pod::Simple).
+included in Pod::Simple) and splitted on ";" (semicolon). Each
+statement (i.e. the stuff between two semicolons) is checked by a
+simple regular expression.
 
-Afterwards, the code will be parsed an the result stored to some save
-interal place.
+If the statement contains either 'use' or 'require', the statment is
+handed over to the parser, who then tries to figure out, B<what> is
+used or required. The results will be saved in a data structure that
+you can then examine.
+
 
 =back
 
@@ -196,21 +225,25 @@ F<grammar> and afterwards run:
 
   perl -MParse::RecDescent - grammar Module::ExtractUseGrammar
 
-=head2 EXPORT
+=head2 EXPORTS
 
 Nothing.
-
-=head1 AUTHOR
-
-Thomas Klausner <domm@zsi.at>
 
 =head1 SEE ALSO
 
 Parse::RecDescent, Module::ScanDeps, Module::Info
 
+=head1 AUTHOR
+
+Thomas Klausner <domm@zsi.at>
+
+=head1 COPYRIGHT
+
+Module::ExtractUse is Copyright (c) 2003 ZSI, Thomas Klausner. All
+rights reserved.
+
+You may distribute under the same terms as Perl itself (Artistic
+License)
+
 =cut
-
-
-
-
 

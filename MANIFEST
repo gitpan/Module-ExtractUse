@@ -4,9 +4,10 @@ grammar
 Makefile.PL
 MANIFEST
 README
+META.yml
 t/1.t
 t/2.t
 t/3.t
 t/failing.t
 eg/cpan.pl
-META.yml
+

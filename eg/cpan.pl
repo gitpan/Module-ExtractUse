@@ -34,7 +34,7 @@ sub find_pms {
 
     my @used=$p->extract_use($_)->array;
     print "\n$File::Find::dir $_\n * ";
-    print join("\n * ",@used);
+    print join("\n * ",@used),"\n";;
 }
 
 

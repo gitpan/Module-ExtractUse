@@ -1,47 +1,62 @@
-start: { @::found=()}
-       line(s?)
-       { $return=\@::found }
+#-----------------------------------------------------------------
+# Rules for use
+#-----------------------------------------------------------------
 
-line: yadda(s?) (use | require)
+use:		/\buse\s/ use_stuff ';'
+		{ $return=$item{use_stuff} }
 
-use: /\buse\s/ (version | base | pragma | module)
+use_stuff:	(base | pragma | version | module)
 
-require: /\brequire\s/ (version | require_name | module_name ';')
+base:		"base" import_list
 
-base: "base" import_list ';'
-	   { push(@::found,@{$item[2]}) }
+pragma:		/[a-z]+/ import_list
+		{ $return=$item[1]}
 
-pragma: /[a-z]+/ ' ' /(.*?);/ { push(@::found,$item[1])}
+module:		module_name module_more
+		{ $return=$item{module_name} }
 
-version: /[\d\._v]+/ ';'
+module_name: 	/[\w:]+/
 
-module: module_name version(?) import_list(?) ';'
+module_more:	eos | version(?) import_list(?)
 
-module_name: /[\w:]+/
-        { push(@::found,$item[1])}
+#-----------------------------------------------------------------
+# Rules for require
+#-----------------------------------------------------------------
 
-import_list: /[(]?/
-            ( quoted_list(s) | plain_list(s) )
-             /[)]?/
-  { $return=$item[2]}
+require:	/\brequire\s/ require_stuff ';'
+		{ $return=$item{require_stuff} }
 
-quoted_list: <perl_quotelike> comma(?) { $return=$item[1][2]}
+require_stuff:	(version | require_name | module)
 
-plain_list: (
-             <perl_quotelike> { $return=$item[1][2]}
-            |
-             /\w+/  { $return=$item[1]}
+require_name:	<perl_quotelike>
+		{ my $name=$item[1][2];
+		  return 1 if ($name=~/\.pl$/);
+		  $name=~s(/)(::)g;
+		  $name=~s/\.pm//;
+		  $return=$name;
+		}
 
-            ) comma(?)
+#-----------------------------------------------------------------
+# General Rules
+#-----------------------------------------------------------------
 
-comma: (',' | '=>')
+version:	/[\d\._v]+/
 
-require_name: <perl_quotelike> ';'
-  { my $name=$item[1][2];
-    return 1 if ($name=~/\.pl$/);
-    $name=~s(/)(::)g;
-    $name=~s/\.pm//;
-    push(@::found,$name)
-  }
+eos:		{ $text=~/^[\s;]+$/ ? 1 : undef;}
 
-yadda: ...!use ...!require /\S+/
+import_list:	/[(]?/
+		list_item
+		comma_list_item(s?)
+		/[)]?/
+		{ $return=$item[2];
+		  $return.=" ".join(" ",@{$item[3]}) if $item[3];
+		}
+
+list_item:	<perl_quotelike> { $return=$item[1][2] }
+		|
+		/\w+/            { $return=$item[1] }
+
+comma_list_item: comma list_item
+		{ $return=$item{list_item} }
+
+comma:		(',' | '=>')
