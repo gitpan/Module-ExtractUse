@@ -1,11 +1,21 @@
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Module-ExtractUse
-version:      0.10
-version_from: ExtractUse.pm
-installdirs:  site
+--- #YAML:1.0
+name: Module-ExtractUse
+version: 0.15
+author:
+  - Thomas Klausner <domm@zsi.at>
+abstract: Find out what modules are used
+license: perl
 requires:
-    Pod::Simple:                   0
-    Parse::RecDescent:             0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.10_04
+  Parse::RecDescent: 1.94
+  Pod::Simple: 3.00
+  Test::Deep: 0.087
+  Test::More: 0
+provides:
+  Module::ExtractUse:
+    file: lib/Module/ExtractUse.pm
+    version: 0.15
+  Module::ExtractUse::Grammar:
+    file: lib/Module/ExtractUse/Grammar.pm
+  Parse::RecDescent::Module::ExtractUse::Grammar:
+    file: lib/Module/ExtractUse/Grammar.pm
+generated_by: Module::Build version 0.25

@@ -1,13 +1,18 @@
+TODO
 Changes
-ExtractUse.pm
-grammar
-Makefile.PL
+lib/Module/ExtractUse.pm
+lib/Module/ExtractUse/Grammar.pm
+lib/Module/ExtractUse/grammar
+Build.PL
 MANIFEST
 README
 META.yml
-t/1.t
-t/2.t
-t/3.t
-t/failing.t
-eg/cpan.pl
+t/01_load.t
+t/10_basic.t
+t/20_parse_self.t
+t/21_comment.t
+t/80_failing.t
+t/99_pod.t
+t/99_pod_coverage.t
+example/cpan.pl
 

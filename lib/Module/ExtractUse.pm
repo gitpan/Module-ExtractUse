@@ -1,15 +1,15 @@
 package Module::ExtractUse;
 
-use 5.006;
 use strict;
 use warnings;
 
 use base 'Pod::Simple';  # for the POD-removing hack
 use Parse::RecDescent;
-use Module::ExtractUseGrammar;
+use Module::ExtractUse::Grammar;
+use Carp;
 
 use vars qw($VERSION);
-$VERSION = '0.10';
+$VERSION = '0.15';
 
 #$::RD_TRACE=1;
 #$::RD_HINT=1;
@@ -18,13 +18,14 @@ sub new {
     my $class=shift;
     return bless
       {
-       found=>undef
+       found=>{},
+       files=>0,
       },$class;
 }
 
 sub extract_use {
     my $self=shift;
-    my $module=shift;
+    my $code_to_parse=shift;
 
     # remove POD - this is a hack
     # as soon as there is Pod::Simple::Remove, this will be replaced by
@@ -32,16 +33,19 @@ sub extract_use {
     my $podless;
     my $pod_parser=__PACKAGE__->_pod_remover();
     $pod_parser->output_string(\$podless);
-    if (ref($module) eq 'SCALAR') {
-	$pod_parser->parse_string_document($$module);
+    if (ref($code_to_parse) eq 'SCALAR') {
+	$pod_parser->parse_string_document($$code_to_parse);
     } else {
-	$pod_parser->parse_file($module);
+	$pod_parser->parse_file($code_to_parse);
     }
+
+    # Strip obvious comments.
+    $podless =~ s/^\s*#.*$//mg;
 
     # to keep parsing time short, split code in statements
     # (I know that this is not very exact, patches welcome!)
     my @statements=split(/;/,$podless);
-    my @found;
+
     foreach my $statement (@statements) {
 	$statement=~s/\n+/ /gs;
 	my $result;
@@ -51,26 +55,29 @@ sub extract_use {
 	# time)
 	if ($statement=~/\buse/) {
 	    $statement=~s/^(.*?)use/use/;
-	    my $parser=Module::ExtractUseGrammar->new();
-	    $result=$parser->use($statement.";");
+	    my $parser=Module::ExtractUse::Grammar->new();
+	    $result=$parser->use($statement.';');
 
 	} elsif ($statement=~/\brequire/) {
 	    $statement=~s/^(.*?)require/require/;
-	    my $parser=Module::ExtractUseGrammar->new();
-	    $result=$parser->require($statement.";");
-
-	} else {
-	    next;
+	    my $parser=Module::ExtractUse::Grammar->new();
+	    $result=$parser->require($statement.';');
 	}
 
-	push(@found,split(/ /,$result)) if $result;
+	next unless $result;
+
+	foreach (split(/ /,$result)) {
+	    $self->_add($_);
+	}
     }
 
-    $self->{'found'}=\@found;
+    # increment file counter
+    $self->_inc_files;
+
     return $self;
 }
 
-# this should be Pod::Simple::Remove
+# this should be Pod::Strip
 # returns a Pod::Simple Object
 sub _pod_remover {
     my $new = shift->SUPER::new(@_);
@@ -86,27 +93,48 @@ sub _pod_remover {
 
 
 # Accessor Methods
-sub _found { return shift->{'found'} }
+sub _add {
+    my $self=shift;
+    my $found=shift;
+    $self->{found}{$found}++;
+}
+sub _found { return shift->{found} }
+sub _inc_files { shift->{files}++ }
 
-sub array { return @{shift->_found} }
-sub arrayref { return shift->_found }
+
+# Accessor Methods
+sub array { return keys(%{shift->{found}}) }
+sub arrayref { 
+    my @a=shift->array;
+    return \@a if @a;
+    return;
+}
 
 sub string {
     my $self=shift;
     my $sep=shift || ' ';
-    return join($sep,@{$self->_found});
+    return join($sep,sort keys(%{$self->{found}}));
 }
 
-sub hashref {
+sub used {
     my $self=shift;
-    my $found;
-    foreach ($self->array) {
-	$found->{$_}++;
-    }
-    return $found;
+    my $key=shift;
+    return $self->{found}{$key} if ($key);
+    return $self->{found};
+}
+# for backward comp
+sub hashref { 
+    carp <<'EOWARN';
+$p->hashref is depracated and will be removed soon.
+Use $p->used instead
+EOWARN
+    return shift->used;
 }
 
 
+sub files {
+    return shift->{files};
+}
 
 1;
 
@@ -131,6 +159,8 @@ Module::ExtractUse - Find out what modules are used
   $p->extract_use(\$string_containg_code);
   
   # use some reporting methods
+  my $uses=$p->uses;           # $uses is a HASHREF
+  print $p->uses('strict')     # true if code includes 'use strictt'
   my @uses=$p->array;
   my $uses=$p->string;
 
@@ -145,24 +175,21 @@ Core, or from CPAN) used by the parsed code.
 
 =head2 Methods
 
-=over
-
-=item *
-
-C<new>
+=head3 new
 
 Returns a parser object
 
-=item *
+=head3 extract_use
 
-C<extract_use($module)>
+C<extract_use($code_to_parse)>
 
 Runs the parser.
 
-C<$module> can be either a SCALAR, in which case Module::ExtractUse
-tries to open the file specified in $module. Or a reference to a
-SCALAR, in which case Module::ExtractUse assumes the referenced scalar
-contains the source code.
+C<$code_to_parse> can be either a SCALAR, in which case
+Module::ExtractUse tries to open the file specified in
+$code_to_parse. Or a reference to a SCALAR, in which case
+Module::ExtractUse assumes the referenced scalar contains the source
+code.
 
 The code will be stripped from POD (using a quickly hacked POD-Remover
 based on Pod::Simple, that should go away as soon as this hack is
@@ -175,8 +202,8 @@ handed over to the parser, who then tries to figure out, B<what> is
 used or required. The results will be saved in a data structure that
 you can then examine.
 
-
-=back
+You can call C<extract_use> several times on different files. It will
+count how many files where examined and how often each module was used.
 
 =head2 Accessor Methods
 
@@ -184,54 +211,62 @@ Those are various ways to get at the result of the parse.
 
 Note that C<extract_use> returns the parser object, so you can say
 
-  print $p->extract_use($module)->string;
+  print $p->extract_use($code_to_parse)->string;
 
-=over
+=head3 used
 
-=item *
+If called without an argument, returns a reference to an hash of all
+used modules. Keys are the names of the modules, values are the number
+of times they were used.
 
-C<string($seperator)>
+If called with an argument, looks up the value of the argument in the
+hash and returns the number of times it was found during parsing.
 
-Returns a string of all used modules, joined using the value of
+This is the prefered accessor.
+
+=head3 string
+
+string($seperator)
+
+Returns a sorted string of all used modules, joined using the value of
 C<$seperator> or using a blank space as a default;
 
-=item *
+Module names are sorted by ascii value (i.e by C<sort>)
 
-C<array>
+=head3 array
 
 Returns an array of all used modules.
 
-=item *
-
-C<arrayref>
+=head3 arrayref
 
 Returns a reference to an array of all used modules. Surprise!
 
-=item *
+=head3 hashref
 
-C<hashref>
+This method is depracated. Use L<used> instead.
 
-Returns a reference to an hash of all used modules.
+Using this method will trigger a warning.
 
-Keys are the names of the modules, values are the number of times they
-were used.
+=head3 files
 
-=back
+Returns the number of files parsed by the parser object.
 
 =head1 RE-COMPILING THE GRAMMAR
 
 If - for some reasons - you need to alter the grammar, edit the file
 F<grammar> and afterwards run:
 
-  perl -MParse::RecDescent - grammar Module::ExtractUseGrammar
+  perl -MParse::RecDescent - grammar Module::ExtractUse::Grammar
 
-=head2 EXPORTS
+Make sure you're in the right directory, i.e. in F<.../Module/ExtractUse/>
+
+=head1 EXPORTS
 
 Nothing.
 
 =head1 SEE ALSO
 
-Parse::RecDescent, Module::ScanDeps, Module::Info
+Parse::RecDescent, Module::ScanDeps, Module::Info, Module::CPANTS::Generator
 
 =head1 AUTHOR
 
@@ -239,8 +274,8 @@ Thomas Klausner <domm@zsi.at>
 
 =head1 COPYRIGHT
 
-Module::ExtractUse is Copyright (c) 2003 ZSI, Thomas Klausner. All
-rights reserved.
+Module::ExtractUse is Copyright (c) 2003,2004 ZSI, Thomas
+Klausner. All rights reserved.
 
 You may distribute under the same terms as Perl itself (Artistic
 License)
