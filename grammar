@@ -1,0 +1,47 @@
+start: { @::found=()}
+       line(s?)
+       { $return=\@::found }
+
+line: yadda(s?) (use | require)
+
+use: /\buse\s/ (version | base | pragma | module)
+
+require: /\brequire\s/ (version | require_name | module_name ';')
+
+base: "base" import_list ';'
+	   { push(@::found,@{$item[2]}) }
+
+pragma: /[a-z]+/ ' ' /(.*?);/ { push(@::found,$item[1])}
+
+version: /[\d\._v]+/ ';'
+
+module: module_name version(?) import_list(?) ';'
+
+module_name: /[\w:]+/
+        { push(@::found,$item[1])}
+
+import_list: /[(]?/
+            ( quoted_list(s) | plain_list(s) )
+             /[)]?/
+  { $return=$item[2]}
+
+quoted_list: <perl_quotelike> comma(?) { $return=$item[1][2]}
+
+plain_list: (
+             <perl_quotelike> { $return=$item[1][2]}
+            |
+             /\w+/  { $return=$item[1]}
+
+            ) comma(?)
+
+comma: (',' | '=>')
+
+require_name: <perl_quotelike> ';'
+  { my $name=$item[1][2];
+    return 1 if ($name=~/\.pl$/);
+    $name=~s(/)(::)g;
+    $name=~s/\.pm//;
+    push(@::found,$name)
+  }
+
+yadda: ...!use ...!require /\S+/

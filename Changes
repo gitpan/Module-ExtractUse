@@ -1,0 +1,17 @@
+Revision history for Perl extension Module::ExtractUse.
+
+0.05  	2003-04-18
+	* added precompilation of grammar to Makefile.PL
+	* changed @found to @::found
+	* init @::found in start-rule instead via startup-action
+
+
+0.04  	2003-03-31
+      	* sort of working
+      	* including docs and tests
+     
+
+0.01  Fri Mar  7 21:06:54 2003
+	- original version; created by h2xs 1.21 with options
+	  -XA -n Module::ExtractUse
+
