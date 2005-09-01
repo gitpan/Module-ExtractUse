@@ -1,6 +1,6 @@
---- #YAML:1.0
+---
 name: Module-ExtractUse
-version: 0.15
+version: 0.16
 author:
   - Thomas Klausner <domm@zsi.at>
 abstract: Find out what modules are used
@@ -10,12 +10,13 @@ requires:
   Pod::Simple: 3.00
   Test::Deep: 0.087
   Test::More: 0
+  Test::NoWarnings: 0
 provides:
   Module::ExtractUse:
     file: lib/Module/ExtractUse.pm
-    version: 0.15
+    version: 0.16
   Module::ExtractUse::Grammar:
     file: lib/Module/ExtractUse/Grammar.pm
   Parse::RecDescent::Module::ExtractUse::Grammar:
     file: lib/Module/ExtractUse/Grammar.pm
-generated_by: Module::Build version 0.25
+generated_by: Module::Build version 0.2609

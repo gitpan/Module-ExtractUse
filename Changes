@@ -1,8 +1,26 @@
 #-----------------------------------------------------------------
 # Changes for Module::ExtractUse
-# $Rev: 8 $
-# $Date: 2004-09-24 12:50:30 +0200 (Fri, 24 Sep 2004) $ 
+# $Rev: 15 $
+# $Date: 2005-09-01 18:12:09 +0200 (Thu, 01 Sep 2005) $ 
 #-----------------------------------------------------------------
+
+2005-09-01
+----------
+d: * added test provided by  BRICAS (thanks a lot)
+d: * removed bug reported by BRICAS
+d: * updated docs and various stuff
+
+
+2005-06-08
+----------
+d: find uses in eval
+
+
+2004-10-01
+----------
+* use Pod::Strip instead of Pod::Simple subclass hack
+* adapted tests
+
 
 2004-09-24
 ----------

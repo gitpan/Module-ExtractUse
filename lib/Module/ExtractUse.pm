@@ -3,40 +3,36 @@ package Module::ExtractUse;
 use strict;
 use warnings;
 
-use base 'Pod::Simple';  # for the POD-removing hack
+use Pod::Strip;
 use Parse::RecDescent;
 use Module::ExtractUse::Grammar;
 use Carp;
 
 use vars qw($VERSION);
-$VERSION = '0.15';
+$VERSION = '0.16';
 
 #$::RD_TRACE=1;
 #$::RD_HINT=1;
 
 sub new {
     my $class=shift;
-    return bless
-      {
-       found=>{},
-       files=>0,
-      },$class;
+    return bless {
+        found=>{},
+        files=>0,
+    },$class;
 }
 
 sub extract_use {
     my $self=shift;
     my $code_to_parse=shift;
 
-    # remove POD - this is a hack
-    # as soon as there is Pod::Simple::Remove, this will be replaced by
-    # it.
     my $podless;
-    my $pod_parser=__PACKAGE__->_pod_remover();
+    my $pod_parser=Pod::Strip->new;
     $pod_parser->output_string(\$podless);
     if (ref($code_to_parse) eq 'SCALAR') {
-	$pod_parser->parse_string_document($$code_to_parse);
+        $pod_parser->parse_string_document($$code_to_parse);
     } else {
-	$pod_parser->parse_file($code_to_parse);
+        $pod_parser->parse_file($code_to_parse);
     }
 
     # Strip obvious comments.
@@ -47,28 +43,34 @@ sub extract_use {
     my @statements=split(/;/,$podless);
 
     foreach my $statement (@statements) {
-	$statement=~s/\n+/ /gs;
-	my $result;
+        $statement=~s/\n+/ /gs;
+        my $result;
 
-	# now that we've got some code containing 'use' or 'require',
-	# parse it! (using different entry point to save some more
-	# time)
-	if ($statement=~/\buse/) {
-	    $statement=~s/^(.*?)use/use/;
-	    my $parser=Module::ExtractUse::Grammar->new();
-	    $result=$parser->use($statement.';');
+        # check for string eval
+        $statement=~s/eval\s["'](.*?)["']/$1;/;
+    
+        # now that we've got some code containing 'use' or 'require',
+        # parse it! (using different entry point to save some more
+        # time)
+        if ($statement=~/\buse/) {
+            $statement=~s/^(.*?)use/use/;
+            eval {
+                my $parser=Module::ExtractUse::Grammar->new();
+                $result=$parser->use($statement.';');
+            };
+        } elsif ($statement=~/\brequire/) {
+            $statement=~s/^(.*?)require/require/;
+            eval {
+                my $parser=Module::ExtractUse::Grammar->new();
+                $result=$parser->require($statement.';');
+            };
+        }
 
-	} elsif ($statement=~/\brequire/) {
-	    $statement=~s/^(.*?)require/require/;
-	    my $parser=Module::ExtractUse::Grammar->new();
-	    $result=$parser->require($statement.';');
-	}
+        next unless $result;
 
-	next unless $result;
-
-	foreach (split(/ /,$result)) {
-	    $self->_add($_);
-	}
+        foreach (split(/ /,$result)) {
+            $self->_add($_);
+        }
     }
 
     # increment file counter
@@ -76,20 +78,6 @@ sub extract_use {
 
     return $self;
 }
-
-# this should be Pod::Strip
-# returns a Pod::Simple Object
-sub _pod_remover {
-    my $new = shift->SUPER::new(@_);
-    $new->code_handler
-      (
-       sub {
-	   print {$_[2]{'output_fh'}} $_[0], "\n";
-	   return;
-       });
-    return $new;
-}
-
 
 
 # Accessor Methods
@@ -122,15 +110,6 @@ sub used {
     return $self->{found}{$key} if ($key);
     return $self->{found};
 }
-# for backward comp
-sub hashref { 
-    carp <<'EOWARN';
-$p->hashref is depracated and will be removed soon.
-Use $p->used instead
-EOWARN
-    return shift->used;
-}
-
 
 sub files {
     return shift->{files};
@@ -191,16 +170,14 @@ $code_to_parse. Or a reference to a SCALAR, in which case
 Module::ExtractUse assumes the referenced scalar contains the source
 code.
 
-The code will be stripped from POD (using a quickly hacked POD-Remover
-based on Pod::Simple, that should go away as soon as this hack is
-included in Pod::Simple) and splitted on ";" (semicolon). Each
-statement (i.e. the stuff between two semicolons) is checked by a
-simple regular expression.
+The code will be stripped from POD (using Pod::Strip) and splitted on ";"
+(semicolon). Each statement (i.e. the stuff between two semicolons) is
+checked by a simple regular expression.
 
 If the statement contains either 'use' or 'require', the statment is
 handed over to the parser, who then tries to figure out, B<what> is
 used or required. The results will be saved in a data structure that
-you can then examine.
+you can examine afterwards.
 
 You can call C<extract_use> several times on different files. It will
 count how many files where examined and how often each module was used.
@@ -241,12 +218,6 @@ Returns an array of all used modules.
 
 Returns a reference to an array of all used modules. Surprise!
 
-=head3 hashref
-
-This method is depracated. Use L<used> instead.
-
-Using this method will trigger a warning.
-
 =head3 files
 
 Returns the number of files parsed by the parser object.
@@ -272,10 +243,17 @@ Parse::RecDescent, Module::ScanDeps, Module::Info, Module::CPANTS::Generator
 
 Thomas Klausner <domm@zsi.at>
 
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-module-extractuse@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>.  I will be notified, and then you'll automatically
+be notified of progress on your bug as I make changes.
+
 =head1 COPYRIGHT
 
-Module::ExtractUse is Copyright (c) 2003,2004 ZSI, Thomas
-Klausner. All rights reserved.
+Module::ExtractUse is Copyright (c) 2003,2004,2005 ZSI,
+Thomas Klausner. All rights reserved.
 
 You may distribute under the same terms as Perl itself (Artistic
 License)

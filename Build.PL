@@ -11,6 +11,7 @@ my $build = Module::Build->new
 		   'Pod::Simple'=>'3.00',
 		   'Test::More'=>'0',
 		   'Test::Deep'=>'0.087',
+           'Test::NoWarnings'=>'0',
 		  },
    create_makefile_pl=>'passthrough',
 );

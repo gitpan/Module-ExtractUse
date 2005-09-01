@@ -20,7 +20,7 @@ use Module::ExtractUse;
     my $p=Module::ExtractUse->new;
     $p->extract_use('lib/Module/ExtractUse.pm');
     cmp_deeply($p->arrayref,
-	       bag(qw(strict warnings vars Pod::Simple Parse::RecDescent Module::ExtractUse::Grammar Carp)),
+	       bag(qw(strict warnings vars Pod::Strip Parse::RecDescent Module::ExtractUse::Grammar Carp)),
 	       'modules used in this Module::ExtractUsed');
 
     my $used=$p->used;

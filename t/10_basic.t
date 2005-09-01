@@ -41,7 +41,16 @@ my @tests=
    ['use base ("Class::DBI6","Foo::Bar7");',[qw(Class::DBI6 Foo::Bar7)]],
 #26
    ['use base "Class::DBI8","Foo::Bar9";',[qw(Class::DBI8 Foo::Bar9)]],
-  );
+   ['eval "use Test::Pod 1.06";',['Test::Pod']],
+   [q{#!/usr/bin/perl -w
+use strict;
+use Test::More;
+eval "use Test::Pod 1.06";
+eval 'use Test::Pod::Coverage 1.06;';
+plan skip_all => "Test::Pod 1.06 required for testing POD" if $@;
+all_pod_files_ok();},[qw(strict Test::More Test::Pod Test::Pod::Coverage)]],
+   
+   );
 
 
 plan tests => (scalar @tests)+1;
