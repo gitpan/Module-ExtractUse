@@ -1,14 +1,22 @@
 #-----------------------------------------------------------------
 # Changes for Module::ExtractUse
-# $Rev: 15 $
-# $Date: 2005-09-01 18:12:09 +0200 (Thu, 01 Sep 2005) $ 
+# $Rev: 16 $
+# $Date: 2005-09-01 18:28:59 +0200 (Thu, 01 Sep 2005) $ 
 #-----------------------------------------------------------------
+
+
+2005-11-07
+----------
+!! release Module-ExtractUse-0.17
+d: updated dependencies (Pod::Strip instead of Pod::Simple)
+
 
 2005-09-01
 ----------
-d: * added test provided by  BRICAS (thanks a lot)
-d: * removed bug reported by BRICAS
-d: * updated docs and various stuff
+!! release Module-ExtractUse-0.16
+d: added test provided by  BRICAS (thanks a lot)
+d: removed bug reported by BRICAS
+d: updated docs and various stuff
 
 
 2005-06-08

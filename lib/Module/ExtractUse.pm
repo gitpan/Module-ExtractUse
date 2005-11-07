@@ -9,7 +9,7 @@ use Module::ExtractUse::Grammar;
 use Carp;
 
 use vars qw($VERSION);
-$VERSION = '0.16';
+$VERSION = '0.17';
 
 #$::RD_TRACE=1;
 #$::RD_HINT=1;
