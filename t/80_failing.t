@@ -19,9 +19,9 @@ foreach my $t (@tests) {
     my ($code,$expected)=@$t;
     my $used=$p->extract_use(\$code)->string;
     if ($used) {
-	is($used,$expected,'');
+        is($used,$expected,'');
     } else {
-	is(undef,$expected,'');
+        is(undef,$expected,'');
     }
 }
 

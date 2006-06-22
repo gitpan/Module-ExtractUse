@@ -2,18 +2,20 @@ use strict;
 use Module::Build;
 use File::Spec::Functions;
 
-my $build = Module::Build->new
-  (
-   module_name => 'Module::ExtractUse',
-   license     => 'perl',
-   requires    => {
-		   'Parse::RecDescent'=>'1.94',
-		   'Pod::Strip'=>'1.00',
-		   'Test::More'=>'0',
-		   'Test::Deep'=>'0.087',
-           'Test::NoWarnings'=>'0',
-		  },
-   create_makefile_pl=>'passthrough',
+my $build = Module::Build->new(
+    module_name => 'Module::ExtractUse',
+    license     => 'perl',
+    requires    => {
+        'Parse::RecDescent'=>'1.94',
+        'Pod::Strip'=>'1.00',
+    },
+	build_requires=> {
+        'Test::More'=>'0',
+        'Test::Deep'=>'0.087',
+        'Test::NoWarnings'=>'0',
+    },
+    create_makefile_pl=>'passthrough',
 );
 
 $build->create_build_script;
+

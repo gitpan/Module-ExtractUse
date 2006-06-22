@@ -17,7 +17,7 @@ module:		module_name module_more
 
 module_name: 	/[\w:]+/
 
-module_more:	eos | version(?) import_list(?)
+module_more:	eos | version(?) var(?) import_list(?)
 
 #-----------------------------------------------------------------
 # Rules for require
@@ -43,6 +43,8 @@ require_name:	<perl_quotelike>
 version:	/[\d\._v]+/
 
 eos:		{ $text=~/^[\s;]+$/ ? 1 : undef;}
+
+var:        /\$[\w+]/
 
 import_list:	/[(]?/
 		list_item

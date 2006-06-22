@@ -1,85 +1,62 @@
 #-----------------------------------------------------------------
 # Changes for Module::ExtractUse
-# $Rev: 16 $
-# $Date: 2005-09-01 18:28:59 +0200 (Thu, 01 Sep 2005) $ 
+# $Rev: 20 $
+# $Date: 2006-06-22 21:09:56 +0200 (Thu, 22 Jun 2006) $ 
 #-----------------------------------------------------------------
 
 
-2005-11-07
-----------
-!! release Module-ExtractUse-0.17
-d: updated dependencies (Pod::Strip instead of Pod::Simple)
+0.18    2006-06-19
+    - resolved [rt.cpan.org #19302] reported by DAGOLDEN@cpan.org
+      (thanks for the hint!)
+      we can now handle stuff like:
+          my $ver=1.22;
+          eval "use Test::Pod $ver;"
+    - moved Test::* prereq into build_requires
 
 
-2005-09-01
-----------
-!! release Module-ExtractUse-0.16
-d: added test provided by  BRICAS (thanks a lot)
-d: removed bug reported by BRICAS
-d: updated docs and various stuff
+0.17	2005-11-07
+    - switched to new Changes format
+    - updated dependencies (Pod::Strip instead of Pod::Simple)
 
 
-2005-06-08
-----------
-d: find uses in eval
+0.16	2005-09-01
+    - added test provided by  BRICAS (thanks a lot)
+    - removed bug reported by BRICAS
+    - updated docs and various stuff
+    - find uses in eval
 
 
-2004-10-01
-----------
-* use Pod::Strip instead of Pod::Simple subclass hack
-* adapted tests
+0.15	2004-10-01
+    - use Pod::Strip instead of Pod::Simple subclass hack
+    - added accessor method C<files>
+    - updated docs
+    - added t/pod.t and t/pod_coverage.t
+    - adapted test suite to new data structure / accessors
+    - resolved rt.cpan.org ticket #7013 "Parser should remember previously
+      scanned modules" (Michael G. Schwern) by shuffling various data
+      structures around
+    - switched to Module::Build
 
 
-2004-09-24
-----------
-* renamed test files
-* added accessor method C<files>
-* updated docs
-* added t/pod.t and t/pod_coverage.t
+0.11	2004-07-20
+    - resolved rt.cpan.org ticket #7012 "uses preceded by a comment can be
+      ignored" by applying the patch by Michael G. Schwern. Thanks!
 
 
-2004-09-23
-----------
-* adapted test suite to new data structure / accessors
-* resolved rt.cpan.org ticket #7013 "Parser should remember previously scanned
-  modules" (Michael G. Schwern) by shuffling various data structures around
-* rearranged dist
-* switched to Module::Build
-* imported into svn
+0.10	2003-06-08
+   - accelerated the parsing:
+     - Parse a statement instead of a whole module
+     - Befor parsing, check with a regex if the statement
+       contains 'use' or 'require'
+     - Enhanced grammer (thanks to $::RD_TRACE)
 
 
-2004-07-20
-----------
-* resolved rt.cpan.org ticket #7012 "uses preceded by a comment can be ignored"
-  by applying the patch by Michael G. Schwern. Thanks!
-	
+0.5	2003-04-18
+    - added precompilation of grammar to Makefile.PL
+    - changed @found to @::found
+    - init @::found in start-rule instead via startup-action
 
 
-2003-06-08	Module-ExtractUse-0.10
-----------
-* accelerated the parsing:
-  - Parse a statement instead of a whole module
-  - Befor parsing, check with a regex if the statement
-    contains 'use' or 'require'
-  - Enhanced grammer (thanks to $::RD_TRACE)
-
-
-
-2003-04-18	Module-ExtractUse-0.05
-----------
-* added precompilation of grammar to Makefile.PL
-* changed @found to @::found
-* init @::found in start-rule instead via startup-action
-
-
-
-2003-03-31	Module-ExtractUse-0.03
-----------
-* sort of working
-* including docs and tests
-     
-
-Fri Mar  7 21:06:54 2003
-	- original version; created by h2xs 1.21 with options
-	  -XA -n Module::ExtractUse
+0.3	2003-03-31
+    - sort of working
 
