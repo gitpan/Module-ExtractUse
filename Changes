@@ -1,8 +1,17 @@
 #-----------------------------------------------------------------
 # Changes for Module::ExtractUse
-# $Rev: 20 $
-# $Date: 2006-06-22 21:09:56 +0200 (Thu, 22 Jun 2006) $ 
+# $Rev$
+# $Date$ 
 #-----------------------------------------------------------------
+
+0.19    2007-04-21
+    - resolved RT #22953 reported by David R Throop
+      documentation error in SYNOPSIS
+    - resolved RT #24066 reported by Jose Pedro Oliveira
+      license clarification
+    - some doc cleanup
+    - added more Test modules to build_requires
+    - no actual code changes where done in this release
 
 
 0.18    2006-06-19

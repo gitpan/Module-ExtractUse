@@ -9,7 +9,7 @@ use Module::ExtractUse::Grammar;
 use Carp;
 
 use vars qw($VERSION);
-$VERSION = '0.18';
+$VERSION = '0.19';
 
 #$::RD_TRACE=1;
 #$::RD_HINT=1;
@@ -138,10 +138,11 @@ Module::ExtractUse - Find out what modules are used
   $p->extract_use(\$string_containg_code);
   
   # use some reporting methods
-  my $uses=$p->uses;           # $uses is a HASHREF
-  print $p->uses('strict')     # true if code includes 'use strictt'
-  my @uses=$p->array;
-  my $uses=$p->string;
+  my $used=$p->used;           # $used is a HASHREF
+  print $p->used('strict')     # true if code includes 'use strict'
+  
+  my @used=$p->array;
+  my $used=$p->string;
 
 
 =head1 DESCRIPTION
@@ -237,7 +238,7 @@ Nothing.
 
 =head1 SEE ALSO
 
-Parse::RecDescent, Module::ScanDeps, Module::Info, Module::CPANTS::Generator
+Parse::RecDescent, Module::ScanDeps, Module::Info, Module::CPANTS::Analyse
 
 =head1 AUTHOR
 
@@ -252,11 +253,10 @@ be notified of progress on your bug as I make changes.
 
 =head1 COPYRIGHT
 
-Module::ExtractUse is Copyright (c) 2003,2004,2005 ZSI,
-Thomas Klausner. All rights reserved.
+Module::ExtractUse is Copyright (c) 2003-2007, Thomas Klausner.
 
-You may distribute under the same terms as Perl itself (Artistic
-License)
+You may use and distribute this module according to the same terms
+that Perl is distributed under.
 
 =cut
 

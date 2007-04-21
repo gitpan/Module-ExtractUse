@@ -13,6 +13,8 @@ my $build = Module::Build->new(
         'Test::More'=>'0',
         'Test::Deep'=>'0.087',
         'Test::NoWarnings'=>'0',
+        'Test::Pod'=>'0',
+        'Test::Pod::Coverage'=>'0',
     },
     create_makefile_pl=>'passthrough',
 );
