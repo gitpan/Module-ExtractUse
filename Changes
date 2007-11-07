@@ -1,8 +1,14 @@
 #-----------------------------------------------------------------
 # Changes for Module::ExtractUse
-# $Rev$
-# $Date$ 
 #-----------------------------------------------------------------
+
+0.20    2007-11-07
+    - resolved RT #30414 by applying the patch submitted by
+      David Landgren
+    - rearranged code to better fit my current Perl style      
+    - added 'use warnings' to Module::ExtractUse::Grammer for that
+      extra kwalitee point
+
 
 0.19    2007-04-21
     - resolved RT #22953 reported by David R Throop

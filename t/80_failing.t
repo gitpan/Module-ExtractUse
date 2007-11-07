@@ -1,7 +1,6 @@
 #!/usr/bin/perl -w
 use strict;
 use Test::More skip_all=>'parser is known to not catch those';
-
 use Module::ExtractUse;
 
 my $p=Module::ExtractUse->new;

@@ -1,6 +1,6 @@
 ---
 name: Module-ExtractUse
-version: 0.19
+version: 0.20
 author:
   - 'Thomas Klausner <domm@zsi.at>'
 abstract: Find out what modules are used
@@ -19,12 +19,12 @@ build_requires:
 provides:
   Module::ExtractUse:
     file: lib/Module/ExtractUse.pm
-    version: 0.19
+    version: 0.20
   Module::ExtractUse::Grammar:
     file: lib/Module/ExtractUse/Grammar.pm
   Parse::RecDescent::Module::ExtractUse::Grammar:
     file: lib/Module/ExtractUse/Grammar.pm
-generated_by: Module::Build version 0.2805
+generated_by: Module::Build version 0.280801
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
   version: 1.2

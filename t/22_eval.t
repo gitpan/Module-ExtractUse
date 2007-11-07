@@ -1,4 +1,4 @@
-use Test::More tests => 4;
+use Test::More tests => 9;
 
 use strict;
 use warnings;
@@ -19,6 +19,41 @@ use Module::ExtractUse;
     $p->extract_use( \$nosemi );
 
     ok( $p->used( 'Test::Pod' ) );
+}
+
+{
+    my $qq = "eval qq{use Test::Pod 1.00}";
+    my $p = Module::ExtractUse->new;
+    $p->extract_use( \$qq );
+    ok( $p->used( 'Test::Pod' ), 'qq brace' );
+}
+
+{
+    my $qq = "eval qq+use Test::Pod+";
+    my $p = Module::ExtractUse->new;
+    $p->extract_use( \$qq );
+    ok( $p->used( 'Test::Pod' ), 'qq plus' );
+}
+
+{
+    my $qq = "eval qq(use Test::Pod)";
+    my $p = Module::ExtractUse->new;
+    $p->extract_use( \$qq );
+    ok( $p->used( 'Test::Pod' ), 'qq paren' );
+}
+
+{
+    my $q = "eval q< use Test::Pod>";
+    my $p = Module::ExtractUse->new;
+    $p->extract_use( \$q );
+    ok( $p->used( 'Test::Pod' ), 'q angle' );
+}
+
+{
+    my $q = "eval  q/use Test::Pod/";
+    my $p = Module::ExtractUse->new;
+    $p->extract_use( \$q );
+    ok( $p->used( 'Test::Pod' ), 'q slash' );
 }
 
 # reported by DAGOLDEN@cpan.org as [rt.cpan.org #19302]

@@ -1,5 +1,6 @@
 package Module::ExtractUse::Grammar;
 use Parse::RecDescent;
+use warnings;
 
 { my $ERRORS;
 
