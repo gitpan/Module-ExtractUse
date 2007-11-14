@@ -13,6 +13,7 @@ t/10_basic.t
 t/20_parse_self.t
 t/21_comment.t
 t/22_eval.t
+t/23_universal_require.t
 t/80_failing.t
 t/99_pod.t
 t/99_pod_coverage.t

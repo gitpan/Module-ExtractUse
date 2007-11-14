@@ -7,7 +7,7 @@ use Pod::Strip;
 use Parse::RecDescent;
 use Module::ExtractUse::Grammar;
 use Carp;
-use version; our $VERSION=version->new('0.20');
+use version; our $VERSION=version->new('0.21');
 
 #$::RD_TRACE=1;
 #$::RD_HINT=1;
@@ -135,14 +135,14 @@ sub extract_use {
             $statement=~s/^(.*?)use/use/;
             eval {
                 my $parser=Module::ExtractUse::Grammar->new();
-                $result=$parser->use($statement.';');
+                $result=$parser->token_use($statement.';');
             };
         }
         elsif ($statement=~/\brequire/) {
             $statement=~s/^(.*?)require/require/;
             eval {
                 my $parser=Module::ExtractUse::Grammar->new();
-                $result=$parser->require($statement.';');
+                $result=$parser->token_require($statement.';');
             };
         }
 

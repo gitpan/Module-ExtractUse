@@ -2,6 +2,15 @@
 # Changes for Module::ExtractUse
 #-----------------------------------------------------------------
 
+
+0.21    2007-11-14
+    - fixed Bug reported by hanekomu via IRC:
+      Modules::ExtractUse breaks if it is used with UNIVERSAL::require
+      so I renamed the grammer tokens 'use' and 'require'. No API changes, 
+      but if you use the grammer directly, you'll have to adapt to the new 
+      names ('token_use' and 'token_reqire')
+
+
 0.20    2007-11-07
     - resolved RT #30414 by applying the patch submitted by
       David Landgren

@@ -15,6 +15,7 @@ my $build = Module::Build->new(
         'Test::NoWarnings'=>'0',
         'Test::Pod'=>'0',
         'Test::Pod::Coverage'=>'0',
+        'UNIVERSAL::require'=>'0',
     },
     create_makefile_pl=>'passthrough',
 );

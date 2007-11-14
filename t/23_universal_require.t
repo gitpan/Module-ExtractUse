@@ -5,6 +5,10 @@ use Test::Deep;
 use Test::NoWarnings;
 use Module::ExtractUse;
 
+eval "use UNIVERSAL::require";
+plan skip_all => 'UNIVERSAL::require required for this tests' if $@;
+
+
 my @tests=
   (
 #1

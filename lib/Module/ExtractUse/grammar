@@ -2,7 +2,7 @@
 # Rules for use
 #-----------------------------------------------------------------
 
-use:		/\buse\s/ use_stuff ';'
+token_use:		/\buse\s/ use_stuff ';'
 		{ $return=$item{use_stuff} }
 
 use_stuff:	(base | pragma | version | module)
@@ -23,7 +23,7 @@ module_more:	eos | version(?) var(?) import_list(?)
 # Rules for require
 #-----------------------------------------------------------------
 
-require:	/\brequire\s/ require_stuff ';'
+token_require:	/\brequire\s/ require_stuff ';'
 		{ $return=$item{require_stuff} }
 
 require_stuff:	(version | require_name | module)
