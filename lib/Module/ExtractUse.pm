@@ -7,7 +7,7 @@ use Pod::Strip;
 use Parse::RecDescent;
 use Module::ExtractUse::Grammar;
 use Carp;
-use version; our $VERSION=version->new('0.21');
+use version; our $VERSION=version->new('0.22');
 
 #$::RD_TRACE=1;
 #$::RD_HINT=1;

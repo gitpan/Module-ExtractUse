@@ -1,6 +1,6 @@
 ---
 name: Module-ExtractUse
-version: 0.21
+version: 0.22
 author:
   - 'Thomas Klausner <domm@zsi.at>'
 abstract: Find out what modules are used
@@ -20,7 +20,7 @@ build_requires:
 provides:
   Module::ExtractUse:
     file: lib/Module/ExtractUse.pm
-    version: 0.21
+    version: 0.22
   Module::ExtractUse::Grammar:
     file: lib/Module/ExtractUse/Grammar.pm
   Parse::RecDescent::Module::ExtractUse::Grammar:

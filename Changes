@@ -3,6 +3,11 @@
 #-----------------------------------------------------------------
 
 
+0.22    2007-11-16
+    - added 'use warnings' again to the Grammer... grr, stupid grammer
+      generator
+
+
 0.21    2007-11-14
     - fixed Bug reported by hanekomu via IRC:
       Modules::ExtractUse breaks if it is used with UNIVERSAL::require

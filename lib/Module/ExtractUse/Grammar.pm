@@ -1,11 +1,13 @@
 package Module::ExtractUse::Grammar;
 use Parse::RecDescent;
+use warnings;
 
 { my $ERRORS;
 
 
 package Parse::RecDescent::Module::ExtractUse::Grammar;
 use strict;
+use warnings;
 use vars qw($skip $AUTOLOAD  );
 $skip = '\s*';
 
