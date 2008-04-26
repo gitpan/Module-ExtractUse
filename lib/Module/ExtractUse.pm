@@ -2,12 +2,13 @@ package Module::ExtractUse;
 
 use strict;
 use warnings;
+use 5.008;
 
 use Pod::Strip;
 use Parse::RecDescent;
 use Module::ExtractUse::Grammar;
 use Carp;
-use version; our $VERSION=version->new('0.22');
+use version; our $VERSION=version->new('0.23');
 
 #$::RD_TRACE=1;
 #$::RD_HINT=1;
@@ -292,9 +293,9 @@ C<bug-module-extractuse@rt.cpan.org>, or through the web interface at
 L<http://rt.cpan.org>.  I will be notified, and then you'll automatically
 be notified of progress on your bug as I make changes.
 
-=head1 COPYRIGHT
+=head1 LICENSE
 
-Module::ExtractUse is Copyright (c) 2003-2007, Thomas Klausner.
+Module::ExtractUse is Copyright (c) 2003-2008, Thomas Klausner.
 
 You may use and distribute this module according to the same terms
 that Perl is distributed under.

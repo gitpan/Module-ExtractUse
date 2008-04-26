@@ -9,7 +9,7 @@ use_stuff:	(base | pragma | version | module)
 
 base:		"base" import_list
 
-pragma:		/[a-z]+/ import_list
+pragma:		/[a-z\d]+/ import_list
 		{ $return=$item[1]}
 
 module:		module_name module_more

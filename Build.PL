@@ -1,4 +1,5 @@
 use strict;
+use 5.008;
 use Module::Build;
 use File::Spec::Functions;
 
@@ -6,6 +7,7 @@ my $build = Module::Build->new(
     module_name => 'Module::ExtractUse',
     license     => 'perl',
     requires    => {
+        'perl'  => '5.008',
         'Parse::RecDescent'=>'1.94',
         'Pod::Strip'=>'1.00',
     },

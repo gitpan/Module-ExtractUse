@@ -48,8 +48,7 @@ eval "use Test::Pod 1.06";
 eval 'use Test::Pod::Coverage 1.06;';
 plan skip_all => "Test::Pod 1.06 required for testing POD" if $@;
 all_pod_files_ok();},[qw(strict Test::More Test::Pod Test::Pod::Coverage)]],
-   
-   );
+);
 
 
 plan tests => (scalar @tests)+1;
@@ -61,15 +60,13 @@ foreach my $t (@tests) {
     my $used=$p->extract_use(\$code)->arrayref;
 
     if (ref($expected) eq 'ARRAY') {
-	cmp_bag($used,$expected);
+        cmp_bag($used,$expected);
     } elsif (!defined $expected) {
-	is(undef,$used,'');
+        is(undef,$used,'');
     } else {
-	is($used,$expected);
+        is($used,$expected);
     }
 }
 
-
-__DATA__
 
 

@@ -7,7 +7,6 @@ use warnings;
 
 package Parse::RecDescent::Module::ExtractUse::Grammar;
 use strict;
-use warnings;
 use vars qw($skip $AUTOLOAD  );
 $skip = '\s*';
 
@@ -1068,7 +1067,7 @@ sub Parse::RecDescent::Module::ExtractUse::Grammar::pragma
 	while (!$_matched && !$commit)
 	{
 		
-		Parse::RecDescent::_trace(q{Trying production: [/[a-z]+/ import_list]},
+		Parse::RecDescent::_trace(q{Trying production: [/[a-z\\d]+/ import_list]},
 					  Parse::RecDescent::_tracefirst($_[1]),
 					  q{pragma},
 					  $tracelevel)
@@ -1081,7 +1080,7 @@ sub Parse::RecDescent::Module::ExtractUse::Grammar::pragma
 		my $repcount = 0;
 
 
-		Parse::RecDescent::_trace(q{Trying terminal: [/[a-z]+/]}, Parse::RecDescent::_tracefirst($text),
+		Parse::RecDescent::_trace(q{Trying terminal: [/[a-z\\d]+/]}, Parse::RecDescent::_tracefirst($text),
 					  q{pragma},
 					  $tracelevel)
 						if defined $::RD_TRACE;
@@ -1089,7 +1088,7 @@ sub Parse::RecDescent::Module::ExtractUse::Grammar::pragma
 		$expectation->is(q{})->at($text);
 		
 
-		unless ($text =~ s/\A($skip)/$lastsep=$1 and ""/e and   $text =~ s/\A(?:[a-z]+)//)
+		unless ($text =~ s/\A($skip)/$lastsep=$1 and ""/e and   $text =~ s/\A(?:[a-z\d]+)//)
 		{
 			
 			$expectation->failed();
@@ -1159,7 +1158,7 @@ sub Parse::RecDescent::Module::ExtractUse::Grammar::pragma
 		
 
 
-		Parse::RecDescent::_trace(q{>>Matched production: [/[a-z]+/ import_list]<<},
+		Parse::RecDescent::_trace(q{>>Matched production: [/[a-z\\d]+/ import_list]<<},
 					  Parse::RecDescent::_tracefirst($text),
 					  q{pragma},
 					  $tracelevel)
@@ -4001,9 +4000,9 @@ package Module::ExtractUse::Grammar; sub new { my $self = bless( {
                                                                          'actcount' => 1,
                                                                          'items' => [
                                                                                       bless( {
-                                                                                               'pattern' => '[a-z]+',
+                                                                                               'pattern' => '[a-z\\d]+',
                                                                                                'hashname' => '__PATTERN1__',
-                                                                                               'description' => '/[a-z]+/',
+                                                                                               'description' => '/[a-z\\\\d]+/',
                                                                                                'lookahead' => 0,
                                                                                                'rdelim' => '/',
                                                                                                'line' => 12,
