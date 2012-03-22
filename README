@@ -1,29 +1,13 @@
-Module/ExtractUse version 0.04
-==============================
-
-Module::ExtractUse is basically a Parse::RecDescent grammar to parse
-Perl code. It tries very hard to find all modules (whether pragmas,
-Core, or from CPAN) used by the parsed code.
 
 
-INSTALLATION
+This archive contains the distribution Module-ExtractUse,
+version 0.25:
 
-To install this module type the following:
+  Find out what modules are used
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+This software is copyright (c) 2012 by Thomas Klausner.
 
-DEPENDENCIES
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This module requires these other modules and libraries:
-
-  Parse::RecDescent
-  Pod::Simple
-  Test::More (only for the testsuite)
-
-COPYRIGHT AND LICENCE
-
-Copyright (C) 2003 Thomas Klausner
 

@@ -1,10 +1,10 @@
 {
    "abstract" : "Find out what modules are used",
    "author" : [
-      "Thomas Klausner <domm@zsi.at>"
+      "Thomas Klausner <domm@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200014, CPAN::Meta::Converter version 2.112150",
    "license" : [
       "perl_5"
    ],
@@ -16,46 +16,40 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::Deep" : "0.087",
-            "Test::More" : 0,
-            "Test::NoWarnings" : 0,
-            "Test::Pod" : 0,
-            "Test::Pod::Coverage" : 0,
-            "UNIVERSAL::require" : 0
+            "Module::Build" : "0.3601"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build" : "0.3601"
          }
       },
       "runtime" : {
          "requires" : {
-            "Parse::RecDescent" : "1.94",
-            "Pod::Strip" : "1.00",
-            "perl" : "5.008"
+            "Carp" : 0,
+            "Parse::RecDescent" : "1.967009",
+            "Pod::Strip" : 0,
+            "perl" : "5.008",
+            "vars" : 0,
+            "version" : 0
          }
-      }
-   },
-   "provides" : {
-      "Module::ExtractUse" : {
-         "file" : "lib/Module/ExtractUse.pm",
-         "version" : "0.24"
       },
-      "Module::ExtractUse::Grammar" : {
-         "file" : "lib/Module/ExtractUse/Grammar.pm",
-         "version" : 0
-      },
-      "Parse::RecDescent::Module::ExtractUse::Grammar" : {
-         "file" : "lib/Module/ExtractUse/Grammar.pm",
-         "version" : 0
+      "test" : {
+         "requires" : {
+            "Test::Deep" : 0,
+            "Test::More" : 0,
+            "Test::NoWarnings" : 0
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ]
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/domm/Module-ExtractUse.git",
+         "web" : "http://github.com/domm/Module-ExtractUse"
+      }
    },
-   "version" : "0.24"
+   "version" : "0.25"
 }
+

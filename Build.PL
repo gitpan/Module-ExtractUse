@@ -1,26 +1,66 @@
-use strict;
-use 5.008;
-use Module::Build;
-use File::Spec::Functions;
 
-my $build = Module::Build->new(
-    module_name => 'Module::ExtractUse',
-    license     => 'perl',
-    requires    => {
-        'perl'  => '5.008',
-        'Parse::RecDescent'=>'1.94',
-        'Pod::Strip'=>'1.00',
-    },
-	build_requires=> {
-        'Test::More'=>'0',
-        'Test::Deep'=>'0.087',
-        'Test::NoWarnings'=>'0',
-        'Test::Pod'=>'0',
-        'Test::Pod::Coverage'=>'0',
-        'UNIVERSAL::require'=>'0',
-    },
-    create_makefile_pl=>'passthrough',
+use strict;
+use warnings;
+
+use Module::Build 0.3601;
+
+my $class = Module::Build->subclass(code => <<'EOF');
+use File::Copy;
+use File::Spec::Functions;
+sub process_grammar_files {
+    my $self = shift;
+    my $grammar='Grammar.pm';
+
+    # precompile grammar
+    system("$^X -MParse::RecDescent - grammar Module::ExtractUse::Grammar");
+
+    # add $VERSION to grammer
+    open(my $fh,'<',$grammar) || die "cannot read $grammar: $!";
+    my @content = <$fh>;
+    close $fh;
+    splice(@content,1,0,'our $VERSION=0.25;'."\n");
+    open(my $out,">",$grammar) || die "cannot write $grammer: $!";
+    print $out @content;
+    close $out;
+
+    # move Grammer.pm to right place
+    my $target = catfile(qw(lib Module ExtractUse),$grammar);
+    move($grammar, $target) || die "Could not move precompiled $grammar to lib/Module/ExtractUse/Grammer.pm: $!";
+}
+
+EOF
+
+my %module_build_args = (
+  'build_requires' => {
+    'Module::Build' => '0.3601',
+    'Test::Deep' => '0',
+    'Test::More' => '0',
+    'Test::NoWarnings' => '0'
+  },
+  'configure_requires' => {
+    'Module::Build' => '0.3601'
+  },
+  'requires' => {
+    'Carp' => '0',
+    'Parse::RecDescent' => '1.967009',
+    'Pod::Strip' => '0',
+    'perl' => '5.008',
+    'vars' => '0',
+    'version' => '0'
+  },
+  'dist_abstract' => 'Find out what modules are used',
+  'dist_author' => [
+    'Thomas Klausner <domm@cpan.org>'
+  ],
+  'dist_name' => 'Module-ExtractUse',
+  'dist_version' => '0.25',
+    'license' => 'perl',
+    'module_name' => 'Module::ExtractUse',
+  'module_name' => 'Module::ExtractUse',
+  'recursive_test_files' => 1,
 );
 
-$build->create_build_script;
+my $build = $class->new(%module_build_args);
+$build->add_build_element('grammar');
 
+$build->create_build_script;

@@ -1,13 +1,16 @@
 Build.PL
 Changes
-example/cpan.pl
-lib/Module/ExtractUse.pm
-lib/Module/ExtractUse/grammar
-lib/Module/ExtractUse/Grammar.pm
-Makefile.PL
+INSTALL
+LICENSE
 MANIFEST
+META.json
 META.yml
 README
+dist.ini
+example/cpan.pl
+grammar
+lib/Module/ExtractUse.pm
+lib/Module/ExtractUse/Grammar.pm
 t/01_load.t
 t/10_basic.t
 t/20_parse_self.t
@@ -19,4 +22,3 @@ t/25_utf8.t
 t/80_failing.t
 xt/pod.t
 xt/pod_coverage.t
-META.json
