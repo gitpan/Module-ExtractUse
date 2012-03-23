@@ -4,7 +4,7 @@
       "Thomas Klausner <domm@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.120530",
+   "generated_by" : "Dist::Zilla version 4.200014, CPAN::Meta::Converter version 2.112150",
    "license" : [
       "perl_5"
    ],
@@ -26,21 +26,19 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
+            "Carp" : 0,
             "Parse::RecDescent" : "1.967009",
-            "Pod::Strip" : "0",
+            "Pod::Strip" : 0,
             "perl" : "5.008",
-            "strict" : "0",
-            "vars" : "0",
-            "version" : "0",
-            "warnings" : "0"
+            "vars" : 0,
+            "version" : 0
          }
       },
       "test" : {
          "requires" : {
-            "Test::Deep" : "0",
-            "Test::More" : "0",
-            "Test::NoWarnings" : "0"
+            "Test::Deep" : 0,
+            "Test::More" : 0,
+            "Test::NoWarnings" : 0
          }
       }
    },
@@ -52,6 +50,6 @@
          "web" : "http://github.com/domm/Module-ExtractUse"
       }
    },
-   "version" : "0.26"
+   "version" : "0.27"
 }
 
