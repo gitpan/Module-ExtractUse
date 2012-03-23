@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build: 0.3601
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.200014, CPAN::Meta::Converter version 2.112150'
+generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.120530'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,8 +21,10 @@ requires:
   Parse::RecDescent: 1.967009
   Pod::Strip: 0
   perl: 5.008
+  strict: 0
   vars: 0
   version: 0
+  warnings: 0
 resources:
   repository: git://github.com/domm/Module-ExtractUse.git
-version: 0.25
+version: 0.26
