@@ -8,7 +8,7 @@ use Pod::Strip;
 use Parse::RecDescent 1.967009;
 use Module::ExtractUse::Grammar;
 use Carp;
-use version; our $VERSION=version->new('0.27');
+use version; our $VERSION=version->new('0.28');
 
 # ABSTRACT: Find out what modules are used
 
@@ -83,8 +83,8 @@ sub extract_use {
 
         next unless $result;
 
-        foreach (split(/ /,$result)) {
-            $self->_add($_);
+        foreach (split(/\s+/,$result)) {
+            $self->_add($_) if($_);
         }
     }
 
@@ -154,7 +154,7 @@ Module::ExtractUse - Find out what modules are used
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 
