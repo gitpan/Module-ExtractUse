@@ -8,7 +8,7 @@ use Pod::Strip;
 use Parse::RecDescent 1.967009;
 use Module::ExtractUse::Grammar;
 use Carp;
-use version; our $VERSION=version->new('0.28');
+use version; our $VERSION=version->new('0.29');
 
 # ABSTRACT: Find out what modules are used
 
@@ -62,19 +62,19 @@ sub extract_use {
                 }
             }
         }
-    
+
         # now that we've got some code containing 'use' or 'require',
         # parse it! (using different entry point to save some more
         # time)
         if ($statement=~/\buse/) {
-            $statement=~s/^(.*?)use/use/;
+            $statement=~s/^(.*?)use\b/use/;
             eval {
                 my $parser=Module::ExtractUse::Grammar->new();
                 $result=$parser->token_use($statement.';');
             };
         }
         elsif ($statement=~/\brequire/) {
-            $statement=~s/^(.*?)require/require/;
+            $statement=~s/^(.*?)require\b/require/s;
             eval {
                 my $parser=Module::ExtractUse::Grammar->new();
                 $result=$parser->token_require($statement.';');
@@ -144,7 +144,7 @@ sub _inc_files {
 
 1;
 
-
+__END__
 
 =pod
 
@@ -154,7 +154,7 @@ Module::ExtractUse - Find out what modules are used
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 SYNOPSIS
 
@@ -293,8 +293,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-
-
