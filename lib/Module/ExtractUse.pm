@@ -8,7 +8,7 @@ use Pod::Strip;
 use Parse::RecDescent 1.967009;
 use Module::ExtractUse::Grammar;
 use Carp;
-use version; our $VERSION=version->new('0.29');
+use version; our $VERSION=version->new('0.30');
 
 # ABSTRACT: Find out what modules are used
 
@@ -25,6 +25,41 @@ sub new {
     },$class;
 }
 
+
+# Regular expression to detect eval
+my $re = qr{
+    \G(?<pre>.*?)
+    eval
+    (?:
+        (?:\s+
+            (?:
+                qq?\((?<eval>.*?)\) # eval q()
+                |
+                qq?\[(?<eval>.*?)\] # eval q[]
+                |
+                qq?{(?<eval>.*?)}   # eval q{}
+                |
+                qq?<(?<eval>.*?)>   # eval q<>
+                |
+                qq?(?<quote>\S)(?<eval>.*?)\k<quote> # eval q'' or so
+            )
+        )
+        |
+        (?:\s*(?:
+            (?:(?<quote>['"])(?<eval>.*?)\k<quote>) # eval '' or eval ""
+            |
+            (?<block> # eval BLOCK
+                {
+                    (?<eval>(?:
+                        (?> [^{}]+ )  # Non-braces without backtracking
+                    |
+                        (?&block)     # Recurse to group: `block'
+                    )*)
+                }
+            )
+        ))
+    )
+}xs;
 
 sub extract_use {
     my $self=shift;
@@ -43,25 +78,19 @@ sub extract_use {
     # Strip obvious comments.
     $podless =~ s/^\s*#.*$//mg;
 
+    my @statements;
+    while($podless =~ /$re/gc) {
     # to keep parsing time short, split code in statements
     # (I know that this is not very exact, patches welcome!)
-    my @statements=split(/;/,$podless);
+        push @statements, map { [ 0, $_ ] } split(/;/, $+{pre}); # non-eval context
+        push @statements, map { [ 1, $_ ] } split(/;/, $+{eval}); # eval context
+    }
+    push @statements, map { [ 0, $_ ] } split(/;/, substr($podless, pos($podless) || 0)); # non-eval context
 
-    foreach my $statement (@statements) {
+    foreach my $statement_ (@statements) {
+        my ($eval, $statement) = @$statement_;
         $statement=~s/\n+/ /gs;
         my $result;
-
-        # check for string eval in ' ', " " strings
-        if ($statement !~ s/eval\s+(['"])(.*?)\1/$2;/) {
-            # if that didn't work, try q and qq strings
-            if ($statement !~ s/eval\s+qq?(\S)(.*?)\1/$2;/) {
-                # finally try paired delims like qq< >, q( ), ...
-                my %pair = qw| ( ) [ ] { } < > |;
-                while (my ($l, $r) = map {quotemeta} each %pair) {
-                    last if $statement =~ s/eval\s+qq?$l(.*?)$r/$1;/;
-                }
-            }
-        }
 
         # now that we've got some code containing 'use' or 'require',
         # parse it! (using different entry point to save some more
@@ -84,7 +113,7 @@ sub extract_use {
         next unless $result;
 
         foreach (split(/\s+/,$result)) {
-            $self->_add($_) if($_);
+            $self->_add($_, $eval) if($_);
         }
     }
 
@@ -104,10 +133,40 @@ sub used {
 }
 
 
+sub used_in_eval {
+    my $self=shift;
+    my $key=shift;
+    return $self->{found_in_eval}{$key} if ($key);
+    return $self->{found_in_eval};
+}
+
+
+sub used_out_of_eval {
+    my $self=shift;
+    my $key=shift;
+    return $self->{found_not_in_eval}{$key} if ($key);
+    return $self->{found_not_in_eval};
+}
+
+
 sub string {
     my $self=shift;
     my $sep=shift || ' ';
     return join($sep,sort keys(%{$self->{found}}));
+}
+
+
+sub string_in_eval {
+    my $self=shift;
+    my $sep=shift || ' ';
+    return join($sep,sort keys(%{$self->{found_in_eval}}));
+}
+
+
+sub string_out_of_eval {
+    my $self=shift;
+    my $sep=shift || ' ';
+    return join($sep,sort keys(%{$self->{found_not_in_eval}}));
 }
 
 
@@ -116,8 +175,32 @@ sub array {
 }
 
 
+sub array_in_eval {
+    return keys(%{shift->{found_in_eval}})
+}
+
+
+sub array_out_of_eval {
+    return keys(%{shift->{found_not_in_eval}})
+}
+
+
 sub arrayref { 
     my @a=shift->array;
+    return \@a if @a;
+    return;
+}
+
+
+sub arrayref_in_eval {
+    my @a=shift->array_in_eval;
+    return \@a if @a;
+    return;
+}
+
+
+sub arrayref_out_of_eval {
+    my @a=shift->array_out_of_eval;
     return \@a if @a;
     return;
 }
@@ -131,7 +214,10 @@ sub files {
 sub _add {
     my $self=shift;
     my $found=shift;
+    my $eval=shift;
     $self->{found}{$found}++;
+    $self->{found_in_eval}{$found}++ if $eval;
+    $self->{found_not_in_eval}{$found}++ unless $eval;
 }
 
 sub _found {
@@ -154,7 +240,7 @@ Module::ExtractUse - Find out what modules are used
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 SYNOPSIS
 
@@ -175,6 +261,20 @@ version 0.29
   
   my @used=$p->array;
   my $used=$p->string;
+  
+  # you can get optional modules, that is use in eval context, in the same style
+  my $used=$p->used_in_eval;           # $used is a HASHREF
+  print $p->used_in_eval('strict')     # true if code includes 'use strict'
+  
+  my @used=$p->array_in_eval;
+  my $used=$p->string_in_eval;
+  
+  # and mandatory modules, that is use out of eval context, in the same style, also.
+  my $used=$p->used_out_of_eval;           # $used is a HASHREF
+  print $p->used_out_of_eval('strict')     # true if code includes 'use strict'
+  
+  my @used=$p->array_out_of_eval;
+  my $used=$p->string_out_of_eval;
 
 =head1 DESCRIPTION
 
@@ -239,6 +339,14 @@ hash and returns the number of times it was found during parsing.
 
 This is the preferred accessor.
 
+=head3 used_in_eval
+
+Same as C<used>, except for considering in-eval-context only.
+
+=head3 used_out_of_eval
+
+Same as C<used>, except for considering NOT-in-eval-context only.
+
 =head3 string
 
     print $p->string($seperator)
@@ -248,17 +356,41 @@ C<$seperator> or using a blank space as a default;
 
 Module names are sorted by ascii value (i.e by C<sort>)
 
+=head3 string_in_eval
+
+Same as C<string>, except for considering in-eval-context only.
+
+=head3 string_out_of_eval
+
+Same as C<string>, except for considering NOT-in-eval-context only.
+
 =head3 array
 
     my @array = $p->array;
 
 Returns an array of all used modules.
 
+=head3 array_in_eval
+
+Same as C<array>, except for considering in-eval-context only.
+
+=head3 array_out_of_eval
+
+Same as C<array>, except for considering NOT-in-eval-context only.
+
 =head3 arrayref
 
     my $arrayref = $p->arrayref;
 
 Returns a reference to an array of all used modules. Surprise!
+
+=head3 arrayref_in_eval
+
+Same as C<array_ref>, except for considering in-eval-context only.
+
+=head3 arrayref_out_of_eval
+
+Same as C<array_ref>, except for considering NOT-in-eval-context only.
 
 =head3 files
 

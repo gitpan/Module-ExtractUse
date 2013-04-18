@@ -27,4 +27,4 @@ requires:
   warnings: 0
 resources:
   repository: git://github.com/domm/Module-ExtractUse.git
-version: 0.29
+version: 0.30
