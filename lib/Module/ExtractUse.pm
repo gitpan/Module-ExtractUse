@@ -8,7 +8,7 @@ use Pod::Strip;
 use Parse::RecDescent 1.967009;
 use Module::ExtractUse::Grammar;
 use Carp;
-use version; our $VERSION=version->new('0.30');
+use version; our $VERSION=version->new('0.31');
 
 # ABSTRACT: Find out what modules are used
 
@@ -27,33 +27,47 @@ sub new {
 
 
 # Regular expression to detect eval
+#  On newer perl, you can use named capture groups and (?&name) for recursive regex
+#  However, it requires perl newer than 5.008 declared as requirement in this module
+my $re_block;
+$re_block = qr {
+    ( # eval BLOCK, corresponding to the group 10 in the entire regex
+        {
+            ((?:
+                (?> [^{}]+ )  # Non-braces without backtracking
+            |
+                (??{$re_block}) # Recurse to group 10
+            )*)
+        }
+    )
+}xs;
 my $re = qr{
-    \G(?<pre>.*?)
+    \G(.*?) # group 1
     eval
     (?:
         (?:\s+
             (?:
-                qq?\((?<eval>.*?)\) # eval q()
+                qq?\((.*?)\) # eval q(), group 2
                 |
-                qq?\[(?<eval>.*?)\] # eval q[]
+                qq?\[(.*?)\] # eval q[], group 3
                 |
-                qq?{(?<eval>.*?)}   # eval q{}
+                qq?{(.*?)}   # eval q{}, group 4
                 |
-                qq?<(?<eval>.*?)>   # eval q<>
+                qq?<(.*?)>   # eval q<>, group 5
                 |
-                qq?(?<quote>\S)(?<eval>.*?)\k<quote> # eval q'' or so
+                qq?(\S)(.*?)\6 # eval q'' or so, group 6, group 7
             )
         )
         |
         (?:\s*(?:
-            (?:(?<quote>['"])(?<eval>.*?)\k<quote>) # eval '' or eval ""
+            (?:(['"])(.*?)\8) # eval '' or eval "", group 8, group 9
             |
-            (?<block> # eval BLOCK
+            ( # eval BLOCK, group 10
                 {
-                    (?<eval>(?:
+                    ((?: # group 11
                         (?> [^{}]+ )  # Non-braces without backtracking
                     |
-                        (?&block)     # Recurse to group: `block'
+                        (??{$re_block}) # Recurse to group 10
                     )*)
                 }
             )
@@ -68,6 +82,7 @@ sub extract_use {
     my $podless;
     my $pod_parser=Pod::Strip->new;
     $pod_parser->output_string(\$podless);
+    $pod_parser->parse_characters(1) if $pod_parser->can('parse_characters');
     if (ref($code_to_parse) eq 'SCALAR') {
         $pod_parser->parse_string_document($$code_to_parse);
     }
@@ -76,14 +91,16 @@ sub extract_use {
     }
 
     # Strip obvious comments.
-    $podless =~ s/^\s*#.*$//mg;
+    $podless =~ s/(^|[\};])\s*#.*$/$1/mg;
 
     my @statements;
     while($podless =~ /$re/gc) {
     # to keep parsing time short, split code in statements
     # (I know that this is not very exact, patches welcome!)
-        push @statements, map { [ 0, $_ ] } split(/;/, $+{pre}); # non-eval context
-        push @statements, map { [ 1, $_ ] } split(/;/, $+{eval}); # eval context
+        my $pre = $1;
+        my $eval = join('', grep { defined $_ } ($2, $3, $4, $5, $7, $9, $11));
+        push @statements, map { [ 0, $_ ] } split(/;/, $pre); # non-eval context
+        push @statements, map { [ 1, $_ ] } split(/;/, $eval); # eval context
     }
     push @statements, map { [ 0, $_ ] } split(/;/, substr($podless, pos($podless) || 0)); # non-eval context
 
@@ -240,7 +257,7 @@ Module::ExtractUse - Find out what modules are used
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 SYNOPSIS
 
