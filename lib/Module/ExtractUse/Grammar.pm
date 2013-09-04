@@ -1135,194 +1135,6 @@ sub Parse::RecDescent::Module::ExtractUse::Grammar::comma_list_item
 }
 
 # ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args, $_itempos)
-sub Parse::RecDescent::Module::ExtractUse::Grammar::pragma
-{
-	my $thisparser = $_[0];
-	use vars q{$tracelevel};
-	local $tracelevel = ($tracelevel||0)+1;
-	$ERRORS = 0;
-    my $thisrule = $thisparser->{"rules"}{"pragma"};
-
-    Parse::RecDescent::_trace(q{Trying rule: [pragma]},
-                  Parse::RecDescent::_tracefirst($_[1]),
-                  q{pragma},
-                  $tracelevel)
-                    if defined $::RD_TRACE;
-
-    
-    my $err_at = @{$thisparser->{errors}};
-
-    my $score;
-    my $score_return;
-    my $_tok;
-    my $return = undef;
-    my $_matched=0;
-    my $commit=0;
-    my @item = ();
-    my %item = ();
-    my $repeating =  $_[2];
-    my $_noactions = $_[3];
-    my @arg =    defined $_[4] ? @{ &{$_[4]} } : ();
-    my $_itempos = $_[5];
-    my %arg =    ($#arg & 01) ? @arg : (@arg, undef);
-    my $text;
-    my $lastsep;
-    my $current_match;
-    my $expectation = new Parse::RecDescent::Expectation(q{/[a-z\\d]+/});
-    $expectation->at($_[1]);
-    
-    my $thisline;
-    tie $thisline, q{Parse::RecDescent::LineCounter}, \$text, $thisparser;
-
-    
-
-    while (!$_matched && !$commit)
-    {
-        
-        Parse::RecDescent::_trace(q{Trying production: [/[a-z\\d]+/ import_list]},
-                      Parse::RecDescent::_tracefirst($_[1]),
-                      q{pragma},
-                      $tracelevel)
-                        if defined $::RD_TRACE;
-        my $thisprod = $thisrule->{"prods"}[0];
-        $text = $_[1];
-        my $_savetext;
-        @item = (q{pragma});
-        %item = (__RULE__ => q{pragma});
-        my $repcount = 0;
-
-
-        Parse::RecDescent::_trace(q{Trying terminal: [/[a-z\\d]+/]}, Parse::RecDescent::_tracefirst($text),
-                      q{pragma},
-                      $tracelevel)
-                        if defined $::RD_TRACE;
-        undef $lastsep;
-        $expectation->is(q{})->at($text);
-        
-
-        unless ($text =~ s/\A($skip)/$lastsep=$1 and ""/e and   $text =~ m/\A(?:[a-z\d]+)/)
-        {
-            $text = $lastsep . $text if defined $lastsep;
-            $expectation->failed();
-            Parse::RecDescent::_trace(q{<<Didn't match terminal>>},
-                          Parse::RecDescent::_tracefirst($text))
-                    if defined $::RD_TRACE;
-
-            last;
-        }
-        $current_match = substr($text, $-[0], $+[0] - $-[0]);
-        substr($text,0,length($current_match),q{});
-        Parse::RecDescent::_trace(q{>>Matched terminal<< (return value: [}
-                        . $current_match . q{])},
-                          Parse::RecDescent::_tracefirst($text))
-                    if defined $::RD_TRACE;
-        push @item, $item{__PATTERN1__}=$current_match;
-        
-
-        Parse::RecDescent::_trace(q{Trying subrule: [import_list]},
-                  Parse::RecDescent::_tracefirst($text),
-                  q{pragma},
-                  $tracelevel)
-                    if defined $::RD_TRACE;
-        if (1) { no strict qw{refs};
-        $expectation->is(q{import_list})->at($text);
-        unless (defined ($_tok = Parse::RecDescent::Module::ExtractUse::Grammar::import_list($thisparser,$text,$repeating,$_noactions,sub { \@arg },undef)))
-        {
-            
-            Parse::RecDescent::_trace(q{<<Didn't match subrule: [import_list]>>},
-                          Parse::RecDescent::_tracefirst($text),
-                          q{pragma},
-                          $tracelevel)
-                            if defined $::RD_TRACE;
-            $expectation->failed();
-            last;
-        }
-        Parse::RecDescent::_trace(q{>>Matched subrule: [import_list]<< (return value: [}
-                    . $_tok . q{]},
-
-                      Parse::RecDescent::_tracefirst($text),
-                      q{pragma},
-                      $tracelevel)
-                        if defined $::RD_TRACE;
-        $item{q{import_list}} = $_tok;
-        push @item, $_tok;
-        
-        }
-
-        Parse::RecDescent::_trace(q{Trying action},
-                      Parse::RecDescent::_tracefirst($text),
-                      q{pragma},
-                      $tracelevel)
-                        if defined $::RD_TRACE;
-        
-
-        $_tok = ($_noactions) ? 0 : do { $return=$item[1]};
-        unless (defined $_tok)
-        {
-            Parse::RecDescent::_trace(q{<<Didn't match action>> (return value: [undef])})
-                    if defined $::RD_TRACE;
-            last;
-        }
-        Parse::RecDescent::_trace(q{>>Matched action<< (return value: [}
-                      . $_tok . q{])},
-                      Parse::RecDescent::_tracefirst($text))
-                        if defined $::RD_TRACE;
-        push @item, $_tok;
-        $item{__ACTION1__}=$_tok;
-        
-
-        Parse::RecDescent::_trace(q{>>Matched production: [/[a-z\\d]+/ import_list]<<},
-                      Parse::RecDescent::_tracefirst($text),
-                      q{pragma},
-                      $tracelevel)
-                        if defined $::RD_TRACE;
-
-
-
-        $_matched = 1;
-        last;
-    }
-
-
-    unless ( $_matched || defined($score) )
-    {
-        
-
-        $_[1] = $text;  # NOT SURE THIS IS NEEDED
-        Parse::RecDescent::_trace(q{<<Didn't match rule>>},
-                     Parse::RecDescent::_tracefirst($_[1]),
-                     q{pragma},
-                     $tracelevel)
-                    if defined $::RD_TRACE;
-        return undef;
-    }
-    if (!defined($return) && defined($score))
-    {
-        Parse::RecDescent::_trace(q{>>Accepted scored production<<}, "",
-                      q{pragma},
-                      $tracelevel)
-                        if defined $::RD_TRACE;
-        $return = $score_return;
-    }
-    splice @{$thisparser->{errors}}, $err_at;
-    $return = $item[$#item] unless defined $return;
-    if (defined $::RD_TRACE)
-    {
-        Parse::RecDescent::_trace(q{>>Matched rule<< (return value: [} .
-                      $return . q{])}, "",
-                      q{pragma},
-                      $tracelevel);
-        Parse::RecDescent::_trace(q{(consumed: [} .
-                      Parse::RecDescent::_tracemax(substr($_[1],0,-length($text))) . q{])},
-                      Parse::RecDescent::_tracefirst($text),
-                      , q{pragma},
-                      $tracelevel)
-    }
-    $_[1] = $text;
-    return $return;
-}
-
-# ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args, $_itempos)
 sub Parse::RecDescent::Module::ExtractUse::Grammar::module_more
 {
 	my $thisparser = $_[0];
@@ -2400,6 +2212,196 @@ sub Parse::RecDescent::Module::ExtractUse::Grammar::base
 }
 
 # ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args, $_itempos)
+sub Parse::RecDescent::Module::ExtractUse::Grammar::parent
+{
+	my $thisparser = $_[0];
+	use vars q{$tracelevel};
+	local $tracelevel = ($tracelevel||0)+1;
+	$ERRORS = 0;
+    my $thisrule = $thisparser->{"rules"}{"parent"};
+
+    Parse::RecDescent::_trace(q{Trying rule: [parent]},
+                  Parse::RecDescent::_tracefirst($_[1]),
+                  q{parent},
+                  $tracelevel)
+                    if defined $::RD_TRACE;
+
+    
+    my $err_at = @{$thisparser->{errors}};
+
+    my $score;
+    my $score_return;
+    my $_tok;
+    my $return = undef;
+    my $_matched=0;
+    my $commit=0;
+    my @item = ();
+    my %item = ();
+    my $repeating =  $_[2];
+    my $_noactions = $_[3];
+    my @arg =    defined $_[4] ? @{ &{$_[4]} } : ();
+    my $_itempos = $_[5];
+    my %arg =    ($#arg & 01) ? @arg : (@arg, undef);
+    my $text;
+    my $lastsep;
+    my $current_match;
+    my $expectation = new Parse::RecDescent::Expectation(q{'parent'});
+    $expectation->at($_[1]);
+    
+    my $thisline;
+    tie $thisline, q{Parse::RecDescent::LineCounter}, \$text, $thisparser;
+
+    
+
+    while (!$_matched && !$commit)
+    {
+        
+        Parse::RecDescent::_trace(q{Trying production: ['parent' import_list]},
+                      Parse::RecDescent::_tracefirst($_[1]),
+                      q{parent},
+                      $tracelevel)
+                        if defined $::RD_TRACE;
+        my $thisprod = $thisrule->{"prods"}[0];
+        $text = $_[1];
+        my $_savetext;
+        @item = (q{parent});
+        %item = (__RULE__ => q{parent});
+        my $repcount = 0;
+
+
+        Parse::RecDescent::_trace(q{Trying terminal: ['parent']},
+                      Parse::RecDescent::_tracefirst($text),
+                      q{parent},
+                      $tracelevel)
+                        if defined $::RD_TRACE;
+        undef $lastsep;
+        $expectation->is(q{})->at($text);
+        
+
+        unless ($text =~ s/\A($skip)/$lastsep=$1 and ""/e and   do { $_tok = "parent"; 1 } and
+             substr($text,0,length($_tok)) eq $_tok and
+             do { substr($text,0,length($_tok)) = ""; 1; }
+        )
+        {
+            $text = $lastsep . $text if defined $lastsep;
+            
+            $expectation->failed();
+            Parse::RecDescent::_trace(q{<<Didn't match terminal>>},
+                          Parse::RecDescent::_tracefirst($text))
+                            if defined $::RD_TRACE;
+            last;
+        }
+        Parse::RecDescent::_trace(q{>>Matched terminal<< (return value: [}
+                        . $_tok . q{])},
+                          Parse::RecDescent::_tracefirst($text))
+                            if defined $::RD_TRACE;
+        push @item, $item{__STRING1__}=$_tok;
+        
+
+        Parse::RecDescent::_trace(q{Trying subrule: [import_list]},
+                  Parse::RecDescent::_tracefirst($text),
+                  q{parent},
+                  $tracelevel)
+                    if defined $::RD_TRACE;
+        if (1) { no strict qw{refs};
+        $expectation->is(q{import_list})->at($text);
+        unless (defined ($_tok = Parse::RecDescent::Module::ExtractUse::Grammar::import_list($thisparser,$text,$repeating,$_noactions,sub { \@arg },undef)))
+        {
+            
+            Parse::RecDescent::_trace(q{<<Didn't match subrule: [import_list]>>},
+                          Parse::RecDescent::_tracefirst($text),
+                          q{parent},
+                          $tracelevel)
+                            if defined $::RD_TRACE;
+            $expectation->failed();
+            last;
+        }
+        Parse::RecDescent::_trace(q{>>Matched subrule: [import_list]<< (return value: [}
+                    . $_tok . q{]},
+
+                      Parse::RecDescent::_tracefirst($text),
+                      q{parent},
+                      $tracelevel)
+                        if defined $::RD_TRACE;
+        $item{q{import_list}} = $_tok;
+        push @item, $_tok;
+        
+        }
+
+        Parse::RecDescent::_trace(q{Trying action},
+                      Parse::RecDescent::_tracefirst($text),
+                      q{parent},
+                      $tracelevel)
+                        if defined $::RD_TRACE;
+        
+
+        $_tok = ($_noactions) ? 0 : do { $return='parent'; $return.=' '.$item[2] if $item[2] !~ /^\s*-norequire\b/; };
+        unless (defined $_tok)
+        {
+            Parse::RecDescent::_trace(q{<<Didn't match action>> (return value: [undef])})
+                    if defined $::RD_TRACE;
+            last;
+        }
+        Parse::RecDescent::_trace(q{>>Matched action<< (return value: [}
+                      . $_tok . q{])},
+                      Parse::RecDescent::_tracefirst($text))
+                        if defined $::RD_TRACE;
+        push @item, $_tok;
+        $item{__ACTION1__}=$_tok;
+        
+
+        Parse::RecDescent::_trace(q{>>Matched production: ['parent' import_list]<<},
+                      Parse::RecDescent::_tracefirst($text),
+                      q{parent},
+                      $tracelevel)
+                        if defined $::RD_TRACE;
+
+
+
+        $_matched = 1;
+        last;
+    }
+
+
+    unless ( $_matched || defined($score) )
+    {
+        
+
+        $_[1] = $text;  # NOT SURE THIS IS NEEDED
+        Parse::RecDescent::_trace(q{<<Didn't match rule>>},
+                     Parse::RecDescent::_tracefirst($_[1]),
+                     q{parent},
+                     $tracelevel)
+                    if defined $::RD_TRACE;
+        return undef;
+    }
+    if (!defined($return) && defined($score))
+    {
+        Parse::RecDescent::_trace(q{>>Accepted scored production<<}, "",
+                      q{parent},
+                      $tracelevel)
+                        if defined $::RD_TRACE;
+        $return = $score_return;
+    }
+    splice @{$thisparser->{errors}}, $err_at;
+    $return = $item[$#item] unless defined $return;
+    if (defined $::RD_TRACE)
+    {
+        Parse::RecDescent::_trace(q{>>Matched rule<< (return value: [} .
+                      $return . q{])}, "",
+                      q{parent},
+                      $tracelevel);
+        Parse::RecDescent::_trace(q{(consumed: [} .
+                      Parse::RecDescent::_tracemax(substr($_[1],0,-length($text))) . q{])},
+                      Parse::RecDescent::_tracefirst($text),
+                      , q{parent},
+                      $tracelevel)
+    }
+    $_[1] = $text;
+    return $return;
+}
+
+# ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args, $_itempos)
 sub Parse::RecDescent::Module::ExtractUse::Grammar::require_stuff
 {
 	my $thisparser = $_[0];
@@ -2711,7 +2713,7 @@ sub Parse::RecDescent::Module::ExtractUse::Grammar::version
     my $text;
     my $lastsep;
     my $current_match;
-    my $expectation = new Parse::RecDescent::Expectation(q{/[\\d\\._v]+/});
+    my $expectation = new Parse::RecDescent::Expectation(q{/v?[\\d\\._]+/});
     $expectation->at($_[1]);
     
     my $thisline;
@@ -2722,7 +2724,7 @@ sub Parse::RecDescent::Module::ExtractUse::Grammar::version
     while (!$_matched && !$commit)
     {
         
-        Parse::RecDescent::_trace(q{Trying production: [/[\\d\\._v]+/]},
+        Parse::RecDescent::_trace(q{Trying production: [/v?[\\d\\._]+/]},
                       Parse::RecDescent::_tracefirst($_[1]),
                       q{version},
                       $tracelevel)
@@ -2735,7 +2737,7 @@ sub Parse::RecDescent::Module::ExtractUse::Grammar::version
         my $repcount = 0;
 
 
-        Parse::RecDescent::_trace(q{Trying terminal: [/[\\d\\._v]+/]}, Parse::RecDescent::_tracefirst($text),
+        Parse::RecDescent::_trace(q{Trying terminal: [/v?[\\d\\._]+/]}, Parse::RecDescent::_tracefirst($text),
                       q{version},
                       $tracelevel)
                         if defined $::RD_TRACE;
@@ -2743,7 +2745,7 @@ sub Parse::RecDescent::Module::ExtractUse::Grammar::version
         $expectation->is(q{})->at($text);
         
 
-        unless ($text =~ s/\A($skip)/$lastsep=$1 and ""/e and   $text =~ m/\A(?:[\d\._v]+)/)
+        unless ($text =~ s/\A($skip)/$lastsep=$1 and ""/e and   $text =~ m/\A(?:v?[\d\._]+)/)
         {
             $text = $lastsep . $text if defined $lastsep;
             $expectation->failed();
@@ -2762,7 +2764,7 @@ sub Parse::RecDescent::Module::ExtractUse::Grammar::version
         push @item, $item{__PATTERN1__}=$current_match;
         
 
-        Parse::RecDescent::_trace(q{>>Matched production: [/[\\d\\._v]+/]<<},
+        Parse::RecDescent::_trace(q{>>Matched production: [/v?[\\d\\._]+/]<<},
                       Parse::RecDescent::_tracefirst($text),
                       q{version},
                       $tracelevel)
@@ -2847,7 +2849,7 @@ sub Parse::RecDescent::Module::ExtractUse::Grammar::use_stuff
     my $text;
     my $lastsep;
     my $current_match;
-    my $expectation = new Parse::RecDescent::Expectation(q{base, or pragma, or version, or module});
+    my $expectation = new Parse::RecDescent::Expectation(q{base, or parent, or version, or module});
     $expectation->at($_[1]);
     
     my $thisline;
@@ -2858,7 +2860,7 @@ sub Parse::RecDescent::Module::ExtractUse::Grammar::use_stuff
     while (!$_matched && !$commit)
     {
         
-        Parse::RecDescent::_trace(q{Trying production: [base, or pragma, or version, or module]},
+        Parse::RecDescent::_trace(q{Trying production: [base, or parent, or version, or module]},
                       Parse::RecDescent::_tracefirst($_[1]),
                       q{use_stuff},
                       $tracelevel)
@@ -2901,7 +2903,7 @@ sub Parse::RecDescent::Module::ExtractUse::Grammar::use_stuff
         
         }
 
-        Parse::RecDescent::_trace(q{>>Matched production: [base, or pragma, or version, or module]<<},
+        Parse::RecDescent::_trace(q{>>Matched production: [base, or parent, or version, or module]<<},
                       Parse::RecDescent::_tracefirst($text),
                       q{use_stuff},
                       $tracelevel)
@@ -3309,7 +3311,7 @@ sub Parse::RecDescent::Module::ExtractUse::Grammar::_alternation_1_of_production
     my $text;
     my $lastsep;
     my $current_match;
-    my $expectation = new Parse::RecDescent::Expectation(q{base, or pragma, or version, or module});
+    my $expectation = new Parse::RecDescent::Expectation(q{base, or parent, or version, or module});
     $expectation->at($_[1]);
     
     my $thisline;
@@ -3379,7 +3381,7 @@ sub Parse::RecDescent::Module::ExtractUse::Grammar::_alternation_1_of_production
     while (!$_matched && !$commit)
     {
         
-        Parse::RecDescent::_trace(q{Trying production: [pragma]},
+        Parse::RecDescent::_trace(q{Trying production: [parent]},
                       Parse::RecDescent::_tracefirst($_[1]),
                       q{_alternation_1_of_production_1_of_rule_use_stuff},
                       $tracelevel)
@@ -3392,17 +3394,17 @@ sub Parse::RecDescent::Module::ExtractUse::Grammar::_alternation_1_of_production
         my $repcount = 0;
 
 
-        Parse::RecDescent::_trace(q{Trying subrule: [pragma]},
+        Parse::RecDescent::_trace(q{Trying subrule: [parent]},
                   Parse::RecDescent::_tracefirst($text),
                   q{_alternation_1_of_production_1_of_rule_use_stuff},
                   $tracelevel)
                     if defined $::RD_TRACE;
         if (1) { no strict qw{refs};
         $expectation->is(q{})->at($text);
-        unless (defined ($_tok = Parse::RecDescent::Module::ExtractUse::Grammar::pragma($thisparser,$text,$repeating,$_noactions,sub { \@arg },undef)))
+        unless (defined ($_tok = Parse::RecDescent::Module::ExtractUse::Grammar::parent($thisparser,$text,$repeating,$_noactions,sub { \@arg },undef)))
         {
             
-            Parse::RecDescent::_trace(q{<<Didn't match subrule: [pragma]>>},
+            Parse::RecDescent::_trace(q{<<Didn't match subrule: [parent]>>},
                           Parse::RecDescent::_tracefirst($text),
                           q{_alternation_1_of_production_1_of_rule_use_stuff},
                           $tracelevel)
@@ -3410,19 +3412,19 @@ sub Parse::RecDescent::Module::ExtractUse::Grammar::_alternation_1_of_production
             $expectation->failed();
             last;
         }
-        Parse::RecDescent::_trace(q{>>Matched subrule: [pragma]<< (return value: [}
+        Parse::RecDescent::_trace(q{>>Matched subrule: [parent]<< (return value: [}
                     . $_tok . q{]},
 
                       Parse::RecDescent::_tracefirst($text),
                       q{_alternation_1_of_production_1_of_rule_use_stuff},
                       $tracelevel)
                         if defined $::RD_TRACE;
-        $item{q{pragma}} = $_tok;
+        $item{q{parent}} = $_tok;
         push @item, $_tok;
         
         }
 
-        Parse::RecDescent::_trace(q{>>Matched production: [pragma]<<},
+        Parse::RecDescent::_trace(q{>>Matched production: [parent]<<},
                       Parse::RecDescent::_tracefirst($text),
                       q{_alternation_1_of_production_1_of_rule_use_stuff},
                       $tracelevel)
@@ -4282,55 +4284,6 @@ package Module::ExtractUse::Grammar; sub new { my $self = bless( {
                                                             'vars' => '',
                                                             'line' => 65
                                                           }, 'Parse::RecDescent::Rule' ),
-                              'pragma' => bless( {
-                                                   'impcount' => 0,
-                                                   'calls' => [
-                                                                'import_list'
-                                                              ],
-                                                   'changed' => 0,
-                                                   'opcount' => 0,
-                                                   'prods' => [
-                                                                bless( {
-                                                                         'number' => 0,
-                                                                         'strcount' => 0,
-                                                                         'dircount' => 0,
-                                                                         'uncommit' => undef,
-                                                                         'error' => undef,
-                                                                         'patcount' => 1,
-                                                                         'actcount' => 1,
-                                                                         'items' => [
-                                                                                      bless( {
-                                                                                               'pattern' => '[a-z\\d]+',
-                                                                                               'hashname' => '__PATTERN1__',
-                                                                                               'description' => '/[a-z\\\\d]+/',
-                                                                                               'lookahead' => 0,
-                                                                                               'rdelim' => '/',
-                                                                                               'line' => 12,
-                                                                                               'mod' => '',
-                                                                                               'ldelim' => '/'
-                                                                                             }, 'Parse::RecDescent::Token' ),
-                                                                                      bless( {
-                                                                                               'subrule' => 'import_list',
-                                                                                               'matchrule' => 0,
-                                                                                               'implicit' => undef,
-                                                                                               'argcode' => undef,
-                                                                                               'lookahead' => 0,
-                                                                                               'line' => 12
-                                                                                             }, 'Parse::RecDescent::Subrule' ),
-                                                                                      bless( {
-                                                                                               'hashname' => '__ACTION1__',
-                                                                                               'lookahead' => 0,
-                                                                                               'line' => 13,
-                                                                                               'code' => '{ $return=$item[1]}'
-                                                                                             }, 'Parse::RecDescent::Action' )
-                                                                                    ],
-                                                                         'line' => undef
-                                                                       }, 'Parse::RecDescent::Production' )
-                                                              ],
-                                                   'name' => 'pragma',
-                                                   'vars' => '',
-                                                   'line' => 12
-                                                 }, 'Parse::RecDescent::Rule' ),
                               'module_more' => bless( {
                                                         'impcount' => 0,
                                                         'calls' => [
@@ -4615,6 +4568,52 @@ package Module::ExtractUse::Grammar; sub new { my $self = bless( {
                                                  'vars' => '',
                                                  'line' => 10
                                                }, 'Parse::RecDescent::Rule' ),
+                              'parent' => bless( {
+                                                   'impcount' => 0,
+                                                   'calls' => [
+                                                                'import_list'
+                                                              ],
+                                                   'changed' => 0,
+                                                   'opcount' => 0,
+                                                   'prods' => [
+                                                                bless( {
+                                                                         'number' => 0,
+                                                                         'strcount' => 1,
+                                                                         'dircount' => 0,
+                                                                         'uncommit' => undef,
+                                                                         'error' => undef,
+                                                                         'patcount' => 0,
+                                                                         'actcount' => 1,
+                                                                         'items' => [
+                                                                                      bless( {
+                                                                                               'pattern' => 'parent',
+                                                                                               'hashname' => '__STRING1__',
+                                                                                               'description' => '\'parent\'',
+                                                                                               'lookahead' => 0,
+                                                                                               'line' => 12
+                                                                                             }, 'Parse::RecDescent::InterpLit' ),
+                                                                                      bless( {
+                                                                                               'subrule' => 'import_list',
+                                                                                               'matchrule' => 0,
+                                                                                               'implicit' => undef,
+                                                                                               'argcode' => undef,
+                                                                                               'lookahead' => 0,
+                                                                                               'line' => 12
+                                                                                             }, 'Parse::RecDescent::Subrule' ),
+                                                                                      bless( {
+                                                                                               'hashname' => '__ACTION1__',
+                                                                                               'lookahead' => 0,
+                                                                                               'line' => 13,
+                                                                                               'code' => '{ $return=\'parent\'; $return.=\' \'.$item[2] if $item[2] !~ /^\\s*-norequire\\b/; }'
+                                                                                             }, 'Parse::RecDescent::Action' )
+                                                                                    ],
+                                                                         'line' => undef
+                                                                       }, 'Parse::RecDescent::Production' )
+                                                              ],
+                                                   'name' => 'parent',
+                                                   'vars' => '',
+                                                   'line' => 12
+                                                 }, 'Parse::RecDescent::Rule' ),
                               'require_stuff' => bless( {
                                                           'impcount' => 1,
                                                           'calls' => [
@@ -4697,9 +4696,9 @@ package Module::ExtractUse::Grammar; sub new { my $self = bless( {
                                                                           'actcount' => 0,
                                                                           'items' => [
                                                                                        bless( {
-                                                                                                'pattern' => '[\\d\\._v]+',
+                                                                                                'pattern' => 'v?[\\d\\._]+',
                                                                                                 'hashname' => '__PATTERN1__',
-                                                                                                'description' => '/[\\\\d\\\\._v]+/',
+                                                                                                'description' => '/v?[\\\\d\\\\._]+/',
                                                                                                 'lookahead' => 0,
                                                                                                 'rdelim' => '/',
                                                                                                 'line' => 43,
@@ -4734,7 +4733,7 @@ package Module::ExtractUse::Grammar; sub new { my $self = bless( {
                                                                                          bless( {
                                                                                                   'subrule' => '_alternation_1_of_production_1_of_rule_use_stuff',
                                                                                                   'matchrule' => 0,
-                                                                                                  'implicit' => 'base, or pragma, or version, or module',
+                                                                                                  'implicit' => 'base, or parent, or version, or module',
                                                                                                   'argcode' => undef,
                                                                                                   'lookahead' => 0,
                                                                                                   'line' => 8
@@ -4852,7 +4851,7 @@ package Module::ExtractUse::Grammar; sub new { my $self = bless( {
                                                                                              'impcount' => 0,
                                                                                              'calls' => [
                                                                                                           'base',
-                                                                                                          'pragma',
+                                                                                                          'parent',
                                                                                                           'version',
                                                                                                           'module'
                                                                                                         ],
@@ -4889,7 +4888,7 @@ package Module::ExtractUse::Grammar; sub new { my $self = bless( {
                                                                                                                    'actcount' => 0,
                                                                                                                    'items' => [
                                                                                                                                 bless( {
-                                                                                                                                         'subrule' => 'pragma',
+                                                                                                                                         'subrule' => 'parent',
                                                                                                                                          'matchrule' => 0,
                                                                                                                                          'implicit' => undef,
                                                                                                                                          'argcode' => undef,
@@ -5072,7 +5071,7 @@ Module::ExtractUse::Grammar
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 AUTHOR
 
