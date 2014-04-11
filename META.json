@@ -1,7 +1,8 @@
 {
    "abstract" : "Find out what modules are used",
    "author" : [
-      "Thomas Klausner <domm@cpan.org>"
+      "Thomas Klausner <domm@cpan.org>",
+      "Kenichi Ishigaki <kishigaki@gmail.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
@@ -52,6 +53,6 @@
          "web" : "http://github.com/domm/Module-ExtractUse"
       }
    },
-   "version" : "0.32"
+   "version" : "0.33"
 }
 

@@ -8,7 +8,7 @@ use Pod::Strip;
 use Parse::RecDescent 1.967009;
 use Module::ExtractUse::Grammar;
 use Carp;
-use version; our $VERSION=version->new('0.32');
+use version; our $VERSION=version->new('0.33');
 
 # ABSTRACT: Find out what modules are used
 
@@ -93,6 +93,9 @@ sub extract_use {
     # Strip obvious comments.
     $podless =~ s/(^|[\};])\s*#.*$/$1/mg;
 
+    # Strip __(DATA|END)__ sections.
+    $podless =~ s/\n__(?:DATA|END)__\b.*$//s;
+
     my @statements;
     while($podless =~ /$re/gc) {
     # to keep parsing time short, split code in statements
@@ -112,25 +115,39 @@ sub extract_use {
         # now that we've got some code containing 'use' or 'require',
         # parse it! (using different entry point to save some more
         # time)
+        my $type;
         if ($statement=~/\buse/) {
             $statement=~s/^(.*?)use\b/use/;
+            next if $1 && $1 =~ /->\s*$/;
             eval {
                 my $parser=Module::ExtractUse::Grammar->new();
                 $result=$parser->token_use($statement.';');
             };
+            $type = 'use';
         }
         elsif ($statement=~/\brequire/) {
             $statement=~s/^(.*?)require\b/require/s;
+            next if $1 && $1 =~ /->\s*$/;
             eval {
                 my $parser=Module::ExtractUse::Grammar->new();
                 $result=$parser->token_require($statement.';');
             };
+            $type = 'require';
+        }
+        elsif ($statement=~/\bno/) {
+            $statement=~s/^(.*?)no\b/no/s;
+            next if $1 && $1 =~ /->\s*$/;
+            eval {
+                my $parser=Module::ExtractUse::Grammar->new();
+                $result=$parser->token_no($statement.';');
+            };
+            $type = 'no';
         }
 
         next unless $result;
 
         foreach (split(/\s+/,$result)) {
-            $self->_add($_, $eval) if($_);
+            $self->_add($_, $eval, $type) if($_);
         }
     }
 
@@ -163,6 +180,54 @@ sub used_out_of_eval {
     my $key=shift;
     return $self->{found_not_in_eval}{$key} if ($key);
     return $self->{found_not_in_eval};
+}
+
+
+sub required {
+    my $self=shift;
+    my $key=shift;
+    return $self->{require}{$key} if ($key);
+    return $self->{require};
+}
+
+
+sub required_in_eval {
+    my $self=shift;
+    my $key=shift;
+    return $self->{require_in_eval}{$key} if ($key);
+    return $self->{require_in_eval};
+}
+
+
+sub required_out_of_eval {
+    my $self=shift;
+    my $key=shift;
+    return $self->{require_not_in_eval}{$key} if ($key);
+    return $self->{require_not_in_eval};
+}
+
+
+sub noed {
+    my $self=shift;
+    my $key=shift;
+    return $self->{no}{$key} if ($key);
+    return $self->{no};
+}
+
+
+sub noed_in_eval {
+    my $self=shift;
+    my $key=shift;
+    return $self->{no_in_eval}{$key} if ($key);
+    return $self->{no_in_eval};
+}
+
+
+sub noed_out_of_eval {
+    my $self=shift;
+    my $key=shift;
+    return $self->{no_not_in_eval}{$key} if ($key);
+    return $self->{no_not_in_eval};
 }
 
 
@@ -232,9 +297,16 @@ sub _add {
     my $self=shift;
     my $found=shift;
     my $eval=shift;
+    my $type=shift;
     $self->{found}{$found}++;
-    $self->{found_in_eval}{$found}++ if $eval;
-    $self->{found_not_in_eval}{$found}++ unless $eval;
+    $self->{$type}{$found}++;
+    if ($eval) {
+        $self->{found_in_eval}{$found}++;
+        $self->{"${type}_in_eval"}{$found}++;
+    } else {
+        $self->{found_not_in_eval}{$found}++;
+        $self->{"${type}_not_in_eval"}{$found}++;
+    }
 }
 
 sub _found {
@@ -257,7 +329,7 @@ Module::ExtractUse - Find out what modules are used
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 SYNOPSIS
 
@@ -326,7 +398,7 @@ The code will be stripped from POD (using Pod::Strip) and split on ";"
 (semicolon). Each statement (i.e. the stuff between two semicolons) is
 checked by a simple regular expression.
 
-If the statement contains either 'use' or 'require', the statment is
+If the statement contains either 'use' or 'require', the statement is
 handed over to the parser, who then tries to figure out, B<what> is
 used or required. The results will be saved in a data structure that
 you can examine afterwards.
@@ -363,6 +435,30 @@ Same as C<used>, except for considering in-eval-context only.
 =head3 used_out_of_eval
 
 Same as C<used>, except for considering NOT-in-eval-context only.
+
+=head3 required
+
+Same as C<used>, except for considering 'require'd modules only.
+
+=head3 required_in_eval
+
+Same as C<required>, except for considering in-eval-context only.
+
+=head3 required_out_of_eval
+
+Same as C<required>, except for considering NOT-in-eval-context only.
+
+=head3 noed
+
+Same as C<used>, except for considering 'no'ed modules only.
+
+=head3 noed_in_eval
+
+Same as C<noed>, except for considering in-eval-context only.
+
+=head3 noed_out_of_eval
+
+Same as C<noed>, except for considering NOT-in-eval-context only.
 
 =head3 string
 
@@ -430,13 +526,23 @@ Nothing.
 
 Parse::RecDescent, Module::ScanDeps, Module::Info, Module::CPANTS::Analyse
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Thomas Klausner <domm@cpan.org>
 
+=item *
+
+Kenichi Ishigaki <kishigaki@gmail.com>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Thomas Klausner.
+This software is copyright (c) 2014 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -18,7 +18,7 @@ sub process_grammar_files {
     open(my $fh,'<',$grammar) || die "cannot read $grammar: $!";
     my @content = <$fh>;
     close $fh;
-    splice(@content,1,0,'our $VERSION=0.32;'."\n");
+    splice(@content,1,0,'our $VERSION=0.33;'."\n");
     open(my $out,">",$grammar) || die "cannot write $grammer: $!";
     print $out @content;
     close $out;
@@ -52,10 +52,11 @@ my %module_build_args = (
   },
   'dist_abstract' => 'Find out what modules are used',
   'dist_author' => [
-    'Thomas Klausner <domm@cpan.org>'
+    'Thomas Klausner <domm@cpan.org>',
+    'Kenichi Ishigaki <kishigaki@gmail.com>'
   ],
   'dist_name' => 'Module-ExtractUse',
-  'dist_version' => '0.32',
+  'dist_version' => '0.33',
     'license' => 'perl',
     'module_name' => 'Module::ExtractUse',
   'module_name' => 'Module::ExtractUse',
